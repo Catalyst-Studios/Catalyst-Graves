@@ -1,0 +1,38 @@
+{
+  "parent": "catalystgraves:simple_grave",
+  "criteria": {
+    "unlock_enchanting": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:enchanting_table"
+          },
+          {
+            "items": "minecraft:enchanted_book"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancement.catalystgraves.soul_binding.description"
+    },
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:enchanting_table"
+    },
+    "title": {
+      "translate": "advancement.catalystgraves.soul_binding"
+    }
+  },
+  "requirements": [
+    [
+      "unlock_enchanting"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

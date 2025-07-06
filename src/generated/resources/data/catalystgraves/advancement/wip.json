@@ -1,0 +1,29 @@
+{
+  "parent": "catalystgraves:greater_vitality",
+  "criteria": {
+    "secret_feature": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancement.catalystgraves.cheat_death.description"
+    },
+    "frame": "challenge",
+    "hidden": true,
+    "icon": {
+      "count": 1,
+      "id": "minecraft:nether_star"
+    },
+    "title": {
+      "translate": "advancement.catalystgraves.cheat_death"
+    }
+  },
+  "requirements": [
+    [
+      "secret_feature"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

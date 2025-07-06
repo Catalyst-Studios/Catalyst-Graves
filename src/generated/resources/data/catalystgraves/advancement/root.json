@@ -1,0 +1,45 @@
+{
+  "criteria": {
+    "dark_in_here": {
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "location": {
+                "light": {
+                  "light": {
+                    "max": 9,
+                    "min": 0
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:location"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "background": "minecraft:textures/block/soul_soil.png",
+    "description": {
+      "translate": "advancement.catalystgraves.root.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "minecraft:skeleton_skull"
+    },
+    "title": {
+      "translate": "advancement.catalystgraves.root"
+    }
+  },
+  "requirements": [
+    [
+      "dark_in_here"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

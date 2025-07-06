@@ -1,0 +1,28 @@
+{
+  "parent": "catalystgraves:simple_grave",
+  "criteria": {
+    "unlock_desecrate": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancement.catalystgraves.desecrate.description"
+    },
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:golden_shovel"
+    },
+    "title": {
+      "translate": "advancement.catalystgraves.desecrate"
+    }
+  },
+  "requirements": [
+    [
+      "unlock_desecrate"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

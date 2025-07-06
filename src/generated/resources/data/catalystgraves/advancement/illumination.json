@@ -1,0 +1,28 @@
+{
+  "parent": "catalystgraves:simple_grave",
+  "criteria": {
+    "unlock_illumination": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancement.catalystgraves.illumination.description"
+    },
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:lantern"
+    },
+    "title": {
+      "translate": "advancement.catalystgraves.illumination"
+    }
+  },
+  "requirements": [
+    [
+      "unlock_illumination"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

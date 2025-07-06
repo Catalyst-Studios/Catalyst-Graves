@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "level=0":
+    {
+      "model": "catalystgraves:block/grave_1"
+    },
+    "level=1":
+    {
+      "model": "catalystgraves:block/grave_2"
+    },
+    "level=2":
+    {
+      "model": "catalystgraves:block/grave_3"
+    }
+  }
+}

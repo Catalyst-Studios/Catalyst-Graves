@@ -1,0 +1,28 @@
+{
+  "parent": "catalystgraves:desecrate",
+  "criteria": {
+    "unlock_organization": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancement.catalystgraves.organization.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:armor_stand"
+    },
+    "title": {
+      "translate": "advancement.catalystgraves.organization"
+    }
+  },
+  "requirements": [
+    [
+      "unlock_organization"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

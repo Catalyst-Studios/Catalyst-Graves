@@ -1,0 +1,28 @@
+{
+  "parent": "catalystgraves:lesser_vitality",
+  "criteria": {
+    "unlock_greater_vitality": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancement.catalystgraves.greater_vitality.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:golden_apple"
+    },
+    "title": {
+      "translate": "advancement.catalystgraves.greater_vitality"
+    }
+  },
+  "requirements": [
+    [
+      "unlock_greater_vitality"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

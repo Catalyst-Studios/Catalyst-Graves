@@ -1,0 +1,9 @@
+{
+  "values": [
+    "minecraft:vanishing_curse",
+    {
+      "id": "catalystgraves:soulbound",
+      "required": false
+    }
+  ]
+}

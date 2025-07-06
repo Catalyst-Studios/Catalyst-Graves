@@ -1,0 +1,28 @@
+{
+  "parent": "catalystgraves:desecrate",
+  "criteria": {
+    "unlock_recall": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancement.catalystgraves.corporeal_recall.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:ender_eye"
+    },
+    "title": {
+      "translate": "advancement.catalystgraves.corporeal_recall"
+    }
+  },
+  "requirements": [
+    [
+      "unlock_recall"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

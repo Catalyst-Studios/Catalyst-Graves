@@ -1,0 +1,28 @@
+{
+  "parent": "catalystgraves:root",
+  "criteria": {
+    "unlock_grave": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancement.catalystgraves.grave.description"
+    },
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:chest"
+    },
+    "title": {
+      "translate": "advancement.catalystgraves.grave"
+    }
+  },
+  "requirements": [
+    [
+      "unlock_grave"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
