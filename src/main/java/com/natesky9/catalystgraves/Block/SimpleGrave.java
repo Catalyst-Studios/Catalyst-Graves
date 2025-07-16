@@ -66,8 +66,17 @@ public class SimpleGrave extends BaseEntityBlock {
 
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        VoxelShape basic = Shapes.or(Block.box(2,0,2,14,2,14),
-                Block.box(3,2,10,13,13,12));
+        VoxelShape basic = Shapes.or(
+                /*
+                * There were other Block.box that came along with the new model, but ended up reducing the amount
+                * as it was causing a massive FPS drop, so would suggest not to increase more of these unless prepped to
+                * suffer while testing it.
+                */
+                Block.box(1, 0, 9, 15, 2.5, 15), // Base
+                Block.box(2, 2, 10, 14, 19, 14), // Body
+                Block.box(2.8, 19, 9.5, 13.3, 21, 14.5), // Top ↓
+                Block.box(4.7, 20, 9.5, 11.3, 23.5, 14.5)
+        );
 
         VoxelShape simple = Shapes.or(Block.box(2,0,2,14,1,14),
                 Block.box(4,0,10,14,8,12));

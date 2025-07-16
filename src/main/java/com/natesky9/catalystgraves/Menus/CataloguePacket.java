@@ -30,7 +30,7 @@ public record CataloguePacket(String name, int cost) implements CustomPacketPayl
     public static class ClientPayloadHandler {
         public static void handleData(final CataloguePacket packet, final IPayloadContext context)
         {
-            System.out.println("client payload");
+            /*System.out.println("client payload");*/
             //we shouldn't need this, since the catalogue only sends client -> server
         }
     }
@@ -47,7 +47,7 @@ public record CataloguePacket(String name, int cost) implements CustomPacketPayl
             AdvancementHolder holder = manager.get(name);
             if (holder == null)
             {
-                System.out.println("Something wrong with the resource location: " + name);
+                /*System.out.println("Something wrong with the resource location: " + name);*/
                 return;
             }
             Advancement advancement = manager.tree().get(holder).advancement();
@@ -56,8 +56,8 @@ public record CataloguePacket(String name, int cost) implements CustomPacketPayl
             int playerLevel = player.experienceLevel;
             if (cost > playerLevel)
             {
-                System.out.println("Cost is higher than player level! "
-                + "How did you manage that?");
+                /*System.out.println("Cost is higher than player level! "
+                + "How did you manage that?");*/
                 return;
             }
             player.giveExperienceLevels(-cost);

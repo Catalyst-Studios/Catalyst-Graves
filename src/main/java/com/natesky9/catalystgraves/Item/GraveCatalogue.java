@@ -39,7 +39,7 @@ public class GraveCatalogue extends Item implements MenuProvider {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
-        System.out.println("use");
+        /*System.out.println("use");*/
 
         if (player.isUsingItem())
             return InteractionResultHolder.consume(player.getItemInHand(usedHand));
@@ -54,7 +54,7 @@ public class GraveCatalogue extends Item implements MenuProvider {
 
     @Override
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
-        System.out.println("useon");
+        /*System.out.println("useon");*/
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
         if (!(context.getPlayer() instanceof ServerPlayer player)) return InteractionResult.PASS;

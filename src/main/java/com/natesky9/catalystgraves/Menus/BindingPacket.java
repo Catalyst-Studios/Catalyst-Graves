@@ -35,14 +35,14 @@ public record BindingPacket(int slot) implements CustomPacketPayload {
     {
         public static void handleData(final BindingPacket packet, final IPayloadContext context)
         {
-            System.out.println("client payload");
+            /*System.out.println("client payload");*/
             //we also shouldn't need this, since it's a serverbound packet
         }
     }
     public static class ServerPayloadHandler {
         public static void handleData(final BindingPacket packet, final IPayloadContext context)
         {
-            System.out.println("received slot: " + packet.slot);
+            /*System.out.println("received slot: " + packet.slot);*/
             ServerPlayer player = (ServerPlayer) context.player();
             ServerLevel serverLevel = player.serverLevel();
             int slot = packet.slot;
@@ -52,14 +52,14 @@ public record BindingPacket(int slot) implements CustomPacketPayload {
             //validate player level
             if (xpLevel < CGConfig.SOULBOUND_COST.get())
             {
-                System.out.println("Player doesn't have the levels to enchant!");
+                /*System.out.println("Player doesn't have the levels to enchant!");*/
                 serverLevel.playSound(null,player.blockPosition(), SoundEvents.GRINDSTONE_USE, SoundSource.PLAYERS);
                 return;
             }
             //validate itemstack has the tag
             if (!stack.is(CGItemTagsProvider.SOULBOUND_APPLICABLE))
             {
-                System.out.println("Item doesn't have the tag " + CGItemTagsProvider.SOULBOUND_APPLICABLE);
+                /*System.out.println("Item doesn't have the tag " + CGItemTagsProvider.SOULBOUND_APPLICABLE);*/
                 serverLevel.playSound(null,player.blockPosition(), SoundEvents.DISPENSER_FAIL, SoundSource.PLAYERS);
                 return;
             }
@@ -69,7 +69,7 @@ public record BindingPacket(int slot) implements CustomPacketPayload {
             if (stack.getEnchantmentLevel(enchantmentHolder) > 0)
             {
                 serverLevel.playSound(null,player.blockPosition(), SoundEvents.DISPENSER_FAIL, SoundSource.PLAYERS);
-                System.out.println("Item already has the enchantment!");
+                /*System.out.println("Item already has the enchantment!");*/
 
                 return;
             }

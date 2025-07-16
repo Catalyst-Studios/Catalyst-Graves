@@ -52,7 +52,7 @@ public class CatalogueButton extends AbstractButton {
         setFocused(false);
 
         double time = Blaze3D.getTime() - mousePressedTime;
-        System.out.println("time mouse held: " + time);
+        /*System.out.println("time mouse held: " + time);*/
         if (time < 2)
         {
             manager.play(SimpleSoundInstance.forUI(SoundEvents.GENERIC_EXTINGUISH_FIRE, 1.0f));

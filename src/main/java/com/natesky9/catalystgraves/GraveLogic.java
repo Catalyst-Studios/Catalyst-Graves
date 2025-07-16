@@ -127,7 +127,7 @@ public class GraveLogic extends SavedData {
         List<ItemStack> itemStacks = new ArrayList<>();
         if (inventory.getContainerSize() == 0)
         {
-            System.out.println("Player had zero items! Unusual...");
+            /*System.out.println("Player had zero items! Unusual...");*/
             return;
         }
         for (int i=0; i<inventory.getContainerSize(); i++)
@@ -139,7 +139,7 @@ public class GraveLogic extends SavedData {
         }
         //put the list
         deathSnapshot.put(uuid,itemStacks);
-        System.out.println("stored items: " + itemStacks);
+        /*System.out.println("stored items: " + itemStacks);*/
         instance.setDirty();
     }
     public static List<ItemStack> getSnapshot(ServerPlayer player)
@@ -275,7 +275,7 @@ public class GraveLogic extends SavedData {
         List<ItemStack> items = soulboundItems.get(player.getUUID());
         if (items == null)
         {
-            System.out.println("No items to restore!");
+            /*System.out.println("No items to restore!");*/
             return;
         }
         for (ItemStack stack:items)

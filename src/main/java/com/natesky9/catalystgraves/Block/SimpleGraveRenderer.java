@@ -59,7 +59,7 @@ public class SimpleGraveRenderer implements BlockEntityRenderer<SimpleGraveEntit
             poseStack.translate(-1f/16,0,0);
         }
         //the -.03 is needed to have the text above the model
-        poseStack.translate(10.5f/16,8.5f/16,10f/16-.03);
+        poseStack.translate(10.7f/16,14.5f/16,10.3f/16-.03);
         poseStack.scale(-width,-width,width);
 
         font.drawInBatch(name,0,0,color,
@@ -76,7 +76,7 @@ public class SimpleGraveRenderer implements BlockEntityRenderer<SimpleGraveEntit
         if (graveItems.isEmpty()) return;
         poseStack.pushPose();
 
-        poseStack.translate(.5f, 2f/16, .5f);
+        poseStack.translate(.4f, 1f/16, .4f);
         poseStack.scale(1f/4, 1f/4, 1f/4);
         poseStack.mulPose(Axis.XN.rotationDegrees(-90));
         //TODO:implement the config option here
