@@ -1,4 +1,4 @@
-package com.natesky9.catalystgraves.Init;
+package com.natesky9.catalystgraves.Events;
 
 import com.natesky9.DataGen.CGDataGenerators;
 import com.natesky9.DataGen.CGAdvancementProvider;
@@ -6,10 +6,12 @@ import com.natesky9.catalystgraves.AdvancementLogic;
 import com.natesky9.catalystgraves.Block.SimpleGraveRenderer;
 import com.natesky9.catalystgraves.CatalystGraves;
 import com.natesky9.catalystgraves.GraveLogic;
+import com.natesky9.catalystgraves.Init.CGBlockEntities;
+import com.natesky9.catalystgraves.Init.CGCommands;
+import com.natesky9.catalystgraves.Init.CGConfig;
+import com.natesky9.catalystgraves.Init.CGItems;
 import com.natesky9.catalystgraves.Menus.BindingPacket;
 import com.natesky9.catalystgraves.Menus.CataloguePacket;
-import com.natesky9.catalystgraves.Screen.BindingScreen;
-import com.natesky9.catalystgraves.Screen.CatalogueScreen;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -17,7 +19,6 @@ import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
@@ -70,12 +71,6 @@ public class CGEvents {
         //if (!level.getBlockState(pos).is(Blocks.NETHER_PORTAL)) return;
         //event.cancelWithResult(ItemInteractionResult.SUCCESS);
         //event.setCancellationResult(ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION);
-    }
-    @SubscribeEvent
-    public static void registerScreens(RegisterMenuScreensEvent event)
-    {
-        event.register(CGMenus.CATALOGUE.get(), CatalogueScreen::new);
-        event.register(CGMenus.BINDING.get(), BindingScreen::new);
     }
     @SubscribeEvent
     public static void registerPackets(RegisterPayloadHandlersEvent event)
@@ -144,10 +139,5 @@ public class CGEvents {
             AdvancementLogic.grant(player, CGAdvancementProvider.DESECRATE);
             AdvancementLogic.grant(player, CGAdvancementProvider.ORGANIZATION);
         }
-    }
-    @SubscribeEvent
-    public static void registerBER(EntityRenderersEvent.RegisterRenderers event)
-    {
-        event.registerBlockEntityRenderer(CGBlockEntities.SIMPLE_GRAVE.get(), SimpleGraveRenderer::new);
     }
 }
