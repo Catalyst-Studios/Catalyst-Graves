@@ -309,6 +309,7 @@ public class GraveLogic extends SavedData {
                     return;
                 }
             }
+            if (!stack.is(item)) continue;
             //now we can process the transmutation
             player.setItemInHand(hand, CGItems.GRAVE_CATALOGUE.toStack());
             player.displayClientMessage(Component.translatable("string.catalogue.aquisition"),true);

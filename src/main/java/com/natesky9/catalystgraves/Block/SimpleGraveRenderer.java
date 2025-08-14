@@ -61,7 +61,7 @@ public class SimpleGraveRenderer implements BlockEntityRenderer<SimpleGraveEntit
         }
         if (state.getValue(SimpleGrave.STYLE) == 2)
         {
-            poseStack.translate(0,-.3/16f,0);
+            poseStack.translate(0,-3/16f,0);
         }
         //the -.03 is needed to have the text above the model
         poseStack.translate(10.7f/16,14.5f/16,10.3f/16-.03);
