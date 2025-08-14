@@ -57,6 +57,11 @@ public class SimpleGraveRenderer implements BlockEntityRenderer<SimpleGraveEntit
         {
             poseStack.mulPose(new Quaternionf(0,0,-.22,1));
             poseStack.translate(-1f/16,0,0);
+            poseStack.translate(0,-5f/16,-.02);
+        }
+        if (state.getValue(SimpleGrave.STYLE) == 2)
+        {
+            poseStack.translate(0,-.3/16f,0);
         }
         //the -.03 is needed to have the text above the model
         poseStack.translate(10.7f/16,14.5f/16,10.3f/16-.03);
