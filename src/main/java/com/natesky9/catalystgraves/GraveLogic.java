@@ -302,6 +302,7 @@ public class GraveLogic extends SavedData {
             if (item.isEmpty())
             {
                 System.out.println(Component.translatable("catalystgraves.configuration.errorInvalidItem"));
+                return;
             }
             //System.out.println("The sleep item is: " + item);
             if (stack.is(Items.WRITABLE_BOOK))
@@ -314,6 +315,7 @@ public class GraveLogic extends SavedData {
                     return;
                 }
             }
+            if (!stack.is(item.get())) continue;
             //now we can process the transmutation
             player.setItemInHand(hand, CGItems.GRAVE_CATALOGUE.toStack());
             player.displayClientMessage(Component.translatable("string.catalogue.aquisition"),true);
