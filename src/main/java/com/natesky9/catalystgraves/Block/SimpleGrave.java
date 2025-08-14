@@ -52,8 +52,9 @@ public class SimpleGrave extends BaseEntityBlock {
             Shapes.join(Block.box(2,0,2,14,1,14),
                     Block.box(4,0,4,14,8,12),BooleanOp.AND);
     VoxelShape BASIC =
-            Shapes.join(Block.box(2,0,2,14,2,14),
-                    Block.box(3,2,10,13,14,14), BooleanOp.AND);
+            Shapes.or(Block.box(1,0,10,15,12,14),
+                    Block.box(2,12,10,14,14,14),
+                    Block.box(5,14,10,11,16,14));
     //VoxelShape TOMBSTONE = Block.box(1,0,10,15,16,14);
     VoxelShape TOMBSTONE = Shapes.or(
             Block.box(1, 0, 9, 15, 2.5, 15), // Base
@@ -67,16 +68,7 @@ public class SimpleGrave extends BaseEntityBlock {
         registerDefaultState(getStateDefinition().any()
                 .setValue(FACING,Direction.NORTH)
                 .setValue(GLOWING,false)
-                .setValue(STYLE, Style(grave.simple)));
-    }
-    public enum grave{
-        simple,
-        basic,
-        tombstone
-    }
-    public static int Style(grave style)
-    {
-        return style.ordinal();
+                .setValue(STYLE, 0));
     }
 
     @Override
@@ -272,7 +264,7 @@ public class SimpleGrave extends BaseEntityBlock {
         return defaultBlockState()
                 .setValue(FACING, context.getHorizontalDirection())
                 .setValue(GLOWING,false)
-                .setValue(STYLE,Style(grave.simple));
+                .setValue(STYLE,0);
     }
 
     @Override
