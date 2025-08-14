@@ -15,8 +15,8 @@ public class CGBlockEntities {
     //
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<SimpleGraveEntity>> SIMPLE_GRAVE =
             BLOCK_ENTITIES.register("simple_grave",
-                    () -> BlockEntityType.Builder.of(SimpleGraveEntity::new,
-                            CGBlocks.SIMPLE_GRAVE.get()).build(null));
+                    () -> new BlockEntityType<>(SimpleGraveEntity::new,
+                            CGBlocks.SIMPLE_GRAVE.get()));
     //
     public static void register(IEventBus eventBus)
     {

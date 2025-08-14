@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
@@ -69,10 +70,9 @@ public class CatalogueButton extends AbstractButton {
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         Minecraft minecraft = Minecraft.getInstance();
         double timePressed = Mth.clamp(Blaze3D.getTime() - mousePressedTime,0,2);
-        guiGraphics.setColor(1.0F, 1.0F, 1.0F, this.alpha);
         RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
-        guiGraphics.blitSprite(SPRITES.get(this.active, false),
+        guiGraphics.blitSprite(RenderType::guiTextured,SPRITES.get(this.active, false),
                 this.getX(), this.getY(), this.getWidth(), this.getHeight());
         guiGraphics.drawCenteredString(minecraft.font,getMessage(),getX()+width/2,getY()+4,16777215);
 
@@ -80,7 +80,7 @@ public class CatalogueButton extends AbstractButton {
         int maxProgress = (int) (Mth.clamp(timePressed/2 * width,0,width*costToLevelRatio));
 
         if (isFocused())
-            guiGraphics.blitSprite(SPRITES.get(this.active, true),
+            guiGraphics.blitSprite(RenderType::guiTextured,SPRITES.get(this.active, true),
                     getX(),getY(), maxProgress,getHeight());
 
         if (active)

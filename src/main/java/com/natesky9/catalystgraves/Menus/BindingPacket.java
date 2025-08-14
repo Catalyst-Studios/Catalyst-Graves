@@ -63,8 +63,8 @@ public record BindingPacket(int slot) implements CustomPacketPayload {
                 serverLevel.playSound(null,player.blockPosition(), SoundEvents.DISPENSER_FAIL, SoundSource.PLAYERS);
                 return;
             }
-            Registry<Enchantment> enchantmentRegistry = player.level().registryAccess().registryOrThrow(Registries.ENCHANTMENT);
-            Holder<Enchantment> enchantmentHolder = enchantmentRegistry.getHolderOrThrow(CGEnchantments.SOULBOUND);
+            Registry<Enchantment> enchantmentRegistry = player.level().registryAccess().lookup(Registries.ENCHANTMENT).get();
+            Holder<Enchantment> enchantmentHolder = enchantmentRegistry.get(CGEnchantments.SOULBOUND).get();
             //validate it doesn't already have the enchantment
             if (stack.getEnchantmentLevel(enchantmentHolder) > 0)
             {

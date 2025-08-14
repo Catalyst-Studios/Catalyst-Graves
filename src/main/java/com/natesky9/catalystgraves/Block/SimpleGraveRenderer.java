@@ -53,10 +53,15 @@ public class SimpleGraveRenderer implements BlockEntityRenderer<SimpleGraveEntit
         int color = 0;
         float width = .4f/font.width(name);
         //case for the tier 0 grave, to rotate the text
-        if (state.getValue(SimpleGrave.STYLE) == 0)
+        if (state.getValue(SimpleGrave.STYLE) == SimpleGrave.Style(SimpleGrave.grave.simple))
         {
             poseStack.mulPose(new Quaternionf(0,0,-.22,1));
             poseStack.translate(-1f/16,0,0);
+            poseStack.translate(0,-5f/16,-.02);
+        }
+        if (state.getValue(SimpleGrave.STYLE) == SimpleGrave.Style(SimpleGrave.grave.basic))
+        {
+            poseStack.translate(0,-.3/16f,0);
         }
         //the -.03 is needed to have the text above the model
         poseStack.translate(10.7f/16,14.5f/16,10.3f/16-.03);

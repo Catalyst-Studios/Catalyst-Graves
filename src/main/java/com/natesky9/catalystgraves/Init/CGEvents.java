@@ -100,7 +100,7 @@ public class CGEvents {
                 ));
     }
     @SubscribeEvent
-    public static void gatherDataEvent(GatherDataEvent event)
+    public static void gatherDataEvent(GatherDataEvent.Client event)
     {
         CGDataGenerators.gatherData(event);
     }

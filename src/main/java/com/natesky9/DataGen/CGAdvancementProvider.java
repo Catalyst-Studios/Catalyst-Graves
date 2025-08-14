@@ -4,16 +4,15 @@ import com.natesky9.catalystgraves.CatalystGraves;
 import net.minecraft.advancements.*;
 import net.minecraft.advancements.critereon.*;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.data.advancements.AdvancementSubProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.common.data.AdvancementProvider;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
 import java.util.function.Consumer;
 
-public class CGAdvancementProvider implements AdvancementProvider.AdvancementGenerator {
+public class CGAdvancementProvider implements AdvancementSubProvider {
     public static ResourceLocation ADVANCEMENT_ROOT = name("root");
     public static ResourceLocation SIMPLE_GRAVE = name("simple_grave");
     public static ResourceLocation LESSER_VITALITY = name("lesser_vitality");
@@ -104,7 +103,7 @@ public class CGAdvancementProvider implements AdvancementProvider.AdvancementGen
     //        .display(Items.NETHER_STAR, Component.literal("R"))
 
     @Override
-    public void generate(HolderLookup.Provider provider, Consumer<AdvancementHolder> consumer, ExistingFileHelper existingFileHelper) {
+    public void generate(HolderLookup.Provider provider, Consumer<AdvancementHolder> consumer) {
         //add advancements here, after initializing them above
         consumer.accept(root);
         consumer.accept(simple_grave);

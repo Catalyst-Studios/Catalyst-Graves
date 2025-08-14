@@ -11,7 +11,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.Tags;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -19,8 +18,8 @@ public class CGItemTagsProvider extends ItemTagsProvider {
     public static TagKey<Item> SOULBOUND_APPLICABLE = ItemTags.create(ResourceLocation
             .fromNamespaceAndPath(CatalystGraves.MODID,"soulbound_applicable"));
     public CGItemTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider,
-                              CompletableFuture<TagLookup<Block>> blockTags, ExistingFileHelper helper) {
-        super(output, lookupProvider,blockTags,CatalystGraves.MODID,helper);
+                              CompletableFuture<TagLookup<Block>> blockTags) {
+        super(output, lookupProvider,blockTags,CatalystGraves.MODID);
     }
 
     @Override

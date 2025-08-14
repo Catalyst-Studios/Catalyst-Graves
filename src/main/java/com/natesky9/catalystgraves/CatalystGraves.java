@@ -36,11 +36,7 @@ public class CatalystGraves {
                 RenderType.CompositeState.builder()
                         .setShaderState(RenderStateShard.RENDERTYPE_LINES_SHADER)
                         .setLineState(new RenderStateShard.LineStateShard(OptionalDouble.of(4)))
-                        //.setLayeringState(RenderStateShard.VIEW_OFFSET_Z_LAYERING)
-                        //.setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
-                        //.setOutputState(RenderStateShard.ITEM_ENTITY_TARGET)
                         .setDepthTestState(RenderStateShard.NO_DEPTH_TEST)
-                        //.setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE)
                         .setCullState(RenderStateShard.NO_CULL)
                         .createCompositeState(false));
 

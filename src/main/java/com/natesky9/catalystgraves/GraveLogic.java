@@ -189,12 +189,12 @@ public class GraveLogic extends SavedData {
         //check for the first free, non-fluid location to place our grave
         //region broad search
         while (!player.level().isInWorldBounds(pos)) {
-            boolean above = pos.getY() >= player.level().getMaxBuildHeight();
-            boolean below = pos.getY() < player.level().getMinBuildHeight();
+            boolean above = pos.getY() >= player.level().getMaxY();
+            boolean below = pos.getY() < player.level().getMinY();
             pos = pos.relative(Direction.Axis.Y, (below ? 1 : 0) - (above ? 1 : 0));
         }
         BlockPos search = pos;
-        while (pos.getY() < player.level().getMaxBuildHeight()) {
+        while (pos.getY() < player.level().getMaxY()) {
             Iterator<BlockPos.MutableBlockPos> iterator = BlockPos.spiralAround
                     (pos, 8, Direction.NORTH, Direction.EAST).iterator();
 
@@ -297,7 +297,12 @@ public class GraveLogic extends SavedData {
         for (InteractionHand hand:InteractionHand.values())
         {
             ItemStack stack = player.getItemInHand(hand);
-            Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(CGConfig.TRANSMUTE_ITEM.get()));
+            Optional<Holder.Reference<Item>> item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(CGConfig.TRANSMUTE_ITEM.get()));
+
+            if (item.isEmpty())
+            {
+                System.out.println(Component.translatable("catalystgraves.configuration.errorInvalidItem"));
+            }
             //System.out.println("The sleep item is: " + item);
             if (stack.is(Items.WRITABLE_BOOK))
             {

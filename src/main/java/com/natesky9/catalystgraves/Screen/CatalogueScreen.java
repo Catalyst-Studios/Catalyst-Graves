@@ -15,6 +15,7 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.multiplayer.ClientAdvancements;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -89,19 +90,18 @@ public class CatalogueScreen extends AbstractContainerScreen<CatalogueMenu> impl
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float v, int i, int i1) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1,1,1,1);
         RenderSystem.setShaderTexture(0,TEXTURE);
         int x = leftPos;
         int y = topPos;
-        guiGraphics.blit(TEXTURE,x,y,0,0,imageWidth,imageHeight);
+        guiGraphics.blit(RenderType::guiTextured,TEXTURE,x,y,0,0,imageWidth,imageHeight,256,256);
 
         //
         x = leftPos + imageWidth/2;
         y = topPos + imageHeight;
         int level = player.experienceLevel;
         String levelString = String.valueOf(level);
-        guiGraphics.blit(XP_BAR,x-16,y-16,0,0,32,8,32,8);
+        guiGraphics.blit(RenderType::guiTextured,XP_BAR,x-16,y-16,0,0,32,8,32,8);
         guiGraphics.drawCenteredString(font,levelString,x,y-20,16777215);
     }
 

@@ -66,6 +66,8 @@
   "catalystgraves.configuration.isGravePrivateProperty": "Private Graves",
   "catalystgraves.configuration.itemDisplayCount": "Items Displayed",
 
+  "catalystgraves.configuration.errorInvalidItem": "Error, transmute config item is not a valid!",
+
   "catalystgraves.desecrate": "Desecrate",
   "catalystgraves.lesser_vitality": "Lesser Vitality",
   "catalystgraves.greater_vitality": "Greater Vitality",

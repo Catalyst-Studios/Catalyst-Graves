@@ -10,6 +10,7 @@ import com.mojang.math.Axis;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -31,12 +32,11 @@ public class BindingScreen extends AbstractContainerScreen<BindingMenu> {
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float v, int i, int i1) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1,1,1,1);
         RenderSystem.setShaderTexture(0,TEXTURE);
         int x = leftPos;
         int y = topPos;
-        guiGraphics.blit(TEXTURE,x,y,0,0,imageWidth,imageHeight);
+        guiGraphics.blit(RenderType::guiTextured,TEXTURE,x,y,0,0,imageWidth,imageHeight,256,256);
 
     }
 

@@ -54,37 +54,39 @@ public class SimpleGrave extends BaseEntityBlock {
     VoxelShape BASIC =
             Shapes.join(Block.box(2,0,2,14,2,14),
                     Block.box(3,2,10,13,14,14), BooleanOp.AND);
-    VoxelShape TOMBSTONE = Block.box(1,0,10,15,16,14);
+    //VoxelShape TOMBSTONE = Block.box(1,0,10,15,16,14);
+    VoxelShape TOMBSTONE = Shapes.or(
+            Block.box(1, 0, 9, 15, 2.5, 15), // Base
+            Block.box(2, 2, 10, 14, 19, 14), // Body
+            Block.box(2.8, 19, 9.5, 13.3, 21, 14.5), // Top ↓
+            Block.box(4.7, 20, 9.5, 11.3, 23.5, 14.5)
+            );
 
     public SimpleGrave(Properties properties) {
         super(properties);
         registerDefaultState(getStateDefinition().any()
                 .setValue(FACING,Direction.NORTH)
                 .setValue(GLOWING,false)
-                .setValue(STYLE, 0));
+                .setValue(STYLE, Style(grave.simple)));
+    }
+    public enum grave{
+        simple,
+        basic,
+        tombstone
+    }
+    public static int Style(grave style)
+    {
+        return style.ordinal();
     }
 
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        VoxelShape basic = Shapes.or(
-                /*
-                * There were other Block.box that came along with the new model, but ended up reducing the amount
-                * as it was causing a massive FPS drop, so would suggest not to increase more of these unless prepped to
-                * suffer while testing it.
-                */
-                Block.box(1, 0, 9, 15, 2.5, 15), // Base
-                Block.box(2, 2, 10, 14, 19, 14), // Body
-                Block.box(2.8, 19, 9.5, 13.3, 21, 14.5), // Top ↓
-                Block.box(4.7, 20, 9.5, 11.3, 23.5, 14.5)
-        );
-
-        VoxelShape simple = Shapes.or(Block.box(2,0,2,14,1,14),
-                Block.box(4,0,10,14,8,12));
         return switch (state.getValue(STYLE))
         {
-
-            case 0-> simple;
-            case 1 -> basic;
+            //don't recreate a voxelshape every tick, or else things *will* lag.
+            //create a static final shape like the ones above
+            case 0-> SIMPLE;
+            case 1 -> BASIC;
             case 2 -> TOMBSTONE;
             default -> super.getShape(state,level,pos,context);
         };
@@ -113,8 +115,8 @@ public class SimpleGrave extends BaseEntityBlock {
                 return super.onDestroyedByPlayer(state,level,pos,player,willHarvest,fluid);
             }
             else
-                if (level instanceof ServerLevel)
-                    player.sendSystemMessage(Component.literal("Crouch to break chest and get contents")
+                if (level instanceof ServerLevel server)
+                    ((ServerPlayer)player).sendSystemMessage(Component.literal("Crouch to break chest and get contents")
                             .withStyle(ChatFormatting.BLUE));
         }
         return false;
@@ -270,7 +272,7 @@ public class SimpleGrave extends BaseEntityBlock {
         return defaultBlockState()
                 .setValue(FACING, context.getHorizontalDirection())
                 .setValue(GLOWING,false)
-                .setValue(STYLE,0);
+                .setValue(STYLE,Style(grave.simple));
     }
 
     @Override

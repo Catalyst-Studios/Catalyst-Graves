@@ -14,7 +14,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
@@ -25,7 +24,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.portal.DimensionTransition;
+import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,11 +37,10 @@ public class GraveCatalogue extends Item implements MenuProvider {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
-        /*System.out.println("use");*/
+    public InteractionResult use(Level level, Player player, InteractionHand usedHand) {
 
         if (player.isUsingItem())
-            return InteractionResultHolder.consume(player.getItemInHand(usedHand));
+            return InteractionResult.CONSUME;
 
         if (player instanceof ServerPlayer server)
         {
@@ -54,7 +52,6 @@ public class GraveCatalogue extends Item implements MenuProvider {
 
     @Override
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
-        /*System.out.println("useon");*/
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
         if (!(context.getPlayer() instanceof ServerPlayer player)) return InteractionResult.PASS;
@@ -103,25 +100,29 @@ public class GraveCatalogue extends Item implements MenuProvider {
     InteractionResult graveFailNoPreviousDeath(Player player)
     {
         //case where the death location doesn't exist
-        player.sendSystemMessage(Component.translatable("string.grave.fail.nondeath"));
         if (player.level() instanceof ServerLevel level)
+        {
+            ((ServerPlayer)player).sendSystemMessage(Component.translatable("string.grave.fail.nondeath"));
             level.playSound(null,player.blockPosition(),SoundEvents.VILLAGER_NO,SoundSource.PLAYERS);
+        }
         return InteractionResult.CONSUME;
     }
     InteractionResult graveFailLevelNull(Player player)
     {
         //case where the level doesn't exist anymore?
-        player.sendSystemMessage(Component.translatable("string.grave.fail.levelnull"));
         if (player.level() instanceof ServerLevel level)
+        {
+            ((ServerPlayer)player).sendSystemMessage(Component.translatable("string.grave.fail.levelnull"));
             level.playSound(null,player.blockPosition(),SoundEvents.VILLAGER_HURT,SoundSource.PLAYERS);
+        }
         return InteractionResult.CONSUME;
     }
     InteractionResult graveSucceedTeleport(Player player,ServerLevel level,BlockPos pos)
     {
-        DimensionTransition transition = new DimensionTransition(level, pos.relative(
+        TeleportTransition transition = new TeleportTransition(level, pos.relative(
                 player.getNearestViewDirection()).getCenter(),Vec3.ZERO,
-                0f,0f, DimensionTransition.DO_NOTHING);
-        player.changeDimension(transition);
+                0f,0f, TeleportTransition.DO_NOTHING);
+        player.teleport(transition);
         if (level instanceof ServerLevel server)
         {
             server.sendParticles(ParticleTypes.REVERSE_PORTAL,pos.getX(),pos.getY(),pos.getZ(),100,1,1,1,1);
