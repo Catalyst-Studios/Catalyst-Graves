@@ -5,6 +5,7 @@ import com.natesky9.catalystgraves.Init.CGBlocks;
 import com.natesky9.catalystgraves.Init.CGConfig;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
+import com.natesky9.catalystgraves.Init.CGRenderTypes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -12,10 +13,14 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.Vec3i;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
@@ -40,7 +45,12 @@ public class SimpleGraveRenderer implements BlockEntityRenderer<SimpleGraveEntit
         //endregion item
 
         if (state.getValue(SimpleGrave.GLOWING))
-            renderSpectralCube(poseStack, multiBufferSource, grave);
+        {
+            Vec3 camera = renderDispatcher.camera.getBlockPosition().getCenter();
+            double distance = camera.distanceTo(grave.getBlockPos().getCenter());
+            if (distance > 4)
+                renderSpectralCube(poseStack, multiBufferSource, grave);
+        }
     }
     void renderName(PoseStack poseStack, MultiBufferSource multiBufferSource, int light, SimpleGraveEntity grave)
     {
@@ -99,7 +109,7 @@ public class SimpleGraveRenderer implements BlockEntityRenderer<SimpleGraveEntit
     }
     void renderSpectralCube(PoseStack poseStack, MultiBufferSource multiBufferSource, SimpleGraveEntity grave)
     {
-        VertexConsumer consumer = multiBufferSource.getBuffer(CatalystGraves.SPECTRAL);
+        VertexConsumer consumer = multiBufferSource.getBuffer(CGRenderTypes.SPECTRAL);
         //
         Shapes.block().forAllEdges(
                 (p_323073_, p_323074_, p_323075_, p_323076_, p_323077_, p_323078_) -> {
