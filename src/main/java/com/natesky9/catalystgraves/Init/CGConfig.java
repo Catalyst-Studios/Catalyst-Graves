@@ -62,7 +62,7 @@ public class CGConfig {
                     .define("spawnWithBook",false);
     public static final ModConfigSpec.ConfigValue<Boolean> FREEBIE =
             BUILDER.comment("Skip the early game, giving the player: SIMPLE_GRAVE, DESECRATE, and ORGANIZATION out of the gate")
-                    .define("giveFreebies",false);
+                    .define("giveFreebies",true);
     public static final ModConfigSpec.ConfigValue<Boolean> PRIVATE_GRAVES =
             BUILDER.comment("Should graves be unlootable by others")
                     .define("isGravePrivateProperty",true);
