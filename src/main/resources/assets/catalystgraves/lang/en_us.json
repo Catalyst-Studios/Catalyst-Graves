@@ -73,5 +73,8 @@
   "catalystgraves.organization": "Organization",
   "catalystgraves.illumination": "Illumination",
 
-  "enchantment.catalystgraves.soulbound": "Soulbound"
+  "enchantment.catalystgraves.soulbound": "Soulbound",
+
+  "tooltip.catalystgraves.press_shift": "Press %s to see more info!",
+  "tooltip.catalystgraves.catalogue.info": "Right click on a enchanting table to get Soulbound items or right click on the air to upgrade the grave"
 }
