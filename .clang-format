@@ -1,0 +1,51 @@
+# .clang-format
+BasedOnStyle: LLVM # Tomamos LLVM como base, luego modificamos
+Language: Java
+
+# Indentación
+IndentWidth: 4
+UseTab: Never
+TabWidth: 4
+
+# Llaves
+BreakBeforeBraces: Allman # Llave de apertura en nueva línea (estilo Allman)
+# Para casos específicos podemos refinarlo:
+# BraceWrapping:
+#   AfterClass: true
+#   AfterControlStatement: true
+#   AfterFunction: true
+#   AfterStruct: true
+#   BeforeElse: true
+
+# Espacios
+SpaceAfterCStyleCast: false
+SpaceAfterLogicalNot: false
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeParens: Never # Espacio antes de '(' en if, for, while, etc.
+SpaceInEmptyParentheses: false
+SpacesInAngles: false
+SpacesInContainerLiterals: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+
+# Parámetros y llamadas
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+AlignOperands: Align
+AlignTrailingComments: false
+
+# Funciones
+AllowShortFunctionsOnASingleLine: None # No compactar funciones cortas en una línea
+AllowShortIfStatementsOnASingleLine: true # Permitir if de una línea sin llaves (como en el código)
+AllowShortLoopsOnASingleLine: true
+
+# Saltos de línea
+ColumnLimit: 0 # Sin límite de longitud de línea
+BreakStringLiterals: false
+
+# Orden de includes (para Java no es muy relevante, pero lo dejamos desactivado)
+SortIncludes: false
+
+# Java específico (algunas opciones pueden no estar soportadas en todas las versiones)
+JavaImportGroups: [] # No reorganizar imports automáticamente

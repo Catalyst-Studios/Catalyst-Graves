@@ -1,7 +1,7 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
-    id 'net.neoforged.moddev' version '2.0.94'
+    id 'net.neoforged.moddev' version '2.0.139'
     id 'idea'
 }
 
@@ -13,6 +13,20 @@ version = mod_version
 group = mod_group_id
 
 repositories {
+    exclusiveContent
+    {
+        forRepository
+        {
+            maven
+            {
+                url "https://cursemaven.com"
+            }
+        }
+        filter
+        {
+            includeGroup "curse.maven"
+        }
+    }
 }
 
 base {
@@ -71,7 +85,11 @@ configurations {
 }
 
 dependencies {
+    compileOnly localRuntime("curse.maven:curios-309927:6529130")
 
+    compileOnly localRuntime("curse.maven:relics-mod-445274:7586568")
+    compileOnly localRuntime("curse.maven:octo-lib-916747:7724006")
+    compileOnly localRuntime("curse.maven:architectury-api-419699:5786327")
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
