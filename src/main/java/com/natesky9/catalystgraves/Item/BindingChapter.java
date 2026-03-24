@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import com.natesky9.catalystgraves.client.menus.BindingMenu;
 
+@SuppressWarnings("null")
 public class BindingChapter implements MenuProvider
 {
     @Override

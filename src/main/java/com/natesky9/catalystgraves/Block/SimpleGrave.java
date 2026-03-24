@@ -1,16 +1,16 @@
 package com.natesky9.catalystgraves.Block;
 
+import com.natesky9.catalystgraves.AdvancementLogic;
 import com.natesky9.catalystgraves.Init.CGConfig;
 import com.natesky9.catalystgraves.compact.CuriosCompat;
 import com.natesky9.catalystgraves.datagen.CGAdvancementProvider;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.ChatFormatting;
-import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.ServerAdvancementManager;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -33,6 +33,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.*;
 import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -121,11 +122,16 @@ public class SimpleGrave extends BaseEntityBlock
 
         if(level.getBlockEntity(pos) instanceof SimpleGraveEntity grave)
         {
-
             if(testPrivateGrave(grave, serverPlayer))
                 return InteractionResult.CONSUME;
 
             takeGraveContents(server, grave, serverPlayer);
+
+            if(!grave.isVitalityClaimed())
+            {
+                processVitality(serverPlayer, server);
+                grave.setVitalityClaimed(true);
+            }
 
             // remove the grave if empty
             if(grave.getItems().isEmpty())
@@ -133,8 +139,6 @@ public class SimpleGrave extends BaseEntityBlock
                 level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
                 level.playSound(null, pos, SoundEvents.STONE_BREAK, SoundSource.BLOCKS);
                 server.sendParticles(ParticleTypes.GLOW, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, 16, 0, 0, 0, .5);
-                // only apply vitality effects when the grave is emptied
-                processVitality(serverPlayer, server);
             }
         }
         return InteractionResult.CONSUME;
@@ -142,30 +146,29 @@ public class SimpleGrave extends BaseEntityBlock
 
     void processVitality(ServerPlayer player, ServerLevel level)
     {
-        // get the advancements and apply effects based on them
-        ServerAdvancementManager manager = player.server.getAdvancements();
+        boolean hasGreaterVitality = AdvancementLogic.hasAdvancement(player, CGAdvancementProvider.GREATER_VITALITY);
+        boolean hasLesserVitality = AdvancementLogic.hasAdvancement(player, CGAdvancementProvider.LESSER_VITALITY);
 
-        AdvancementHolder vitalityHolder = manager.get(CGAdvancementProvider.LESSER_VITALITY);
-        boolean hasVitality = vitalityHolder != null && player.getAdvancements().getOrStartProgress(vitalityHolder).isDone();
-
-        AdvancementHolder majorVitalityHolder = manager.get(CGAdvancementProvider.GREATER_VITALITY);
-        boolean hasGreaterVitality = majorVitalityHolder != null && player.getAdvancements().getOrStartProgress(majorVitalityHolder).isDone();
-
-        if(hasVitality)
-            refillStats(player, level);
-
-        if(hasGreaterVitality)
-            player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION,
-                                                   CGConfig.VITALITY_DURATION.get(), CGConfig.VITALITY_AMPLIFIER.get()));
-    }
-
-    void refillStats(ServerPlayer player, ServerLevel level)
-    {
-        // refill health, air, and food for the player, with some particle effects
-        player.setHealth(player.getMaxHealth());
         player.setAirSupply(player.getMaxAirSupply());
-        player.getFoodData().setFoodLevel(20);
-        player.getFoodData().setSaturation(20);
+        if(hasGreaterVitality)
+        {
+            player.setHealth(player.getMaxHealth());
+            player.getFoodData().eat(12, 1.0F);
+            player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 1200, 1));
+
+            int duration = CGConfig.VITALITY_DURATION.get() > 0 ? CGConfig.VITALITY_DURATION.get() : 1200;
+            player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, duration, 2));
+            player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 1200, 0));
+            player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 400, 0));
+        }
+        else if(hasLesserVitality)
+        {
+            player.setHealth(player.getMaxHealth());
+
+            player.getFoodData().eat(6, 0.5F);
+
+            player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 1200, 0));
+        }
         level.sendParticles(ParticleTypes.HEART, player.getX(), player.getY(), player.getZ(), 8, 0, 0, 0, .5);
         level.playSound(null, player.blockPosition(), SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS);
     }
@@ -190,10 +193,9 @@ public class SimpleGrave extends BaseEntityBlock
         if(CuriosCompat.isLoaded())
         {
             CuriosCompat.restoreCurios(player, grave.getCuriosItems());
+            grave.getCuriosItems().clear();
         }
 
-        // 2. Restaurar Inventario Normal por Slot
-        // Como usamos un snapshot, el índice i de la tumba es el índice i del jugador
         for(int i = 0; i < player.getInventory().getContainerSize(); i++)
         {
             if(i < grave.getItems().size())
@@ -201,7 +203,6 @@ public class SimpleGrave extends BaseEntityBlock
                 ItemStack stackEnTumba = grave.getItems().get(i);
                 if(!stackEnTumba.isEmpty())
                 {
-                    // Si el slot está vacío, lo ponemos. Si no (raro), lo dropeamos o añadimos
                     if(player.getInventory().getItem(i).isEmpty())
                     {
                         player.getInventory().setItem(i, stackEnTumba.copy());
@@ -210,10 +211,12 @@ public class SimpleGrave extends BaseEntityBlock
                     {
                         player.addItem(stackEnTumba.copy());
                     }
+                    grave.getItems().set(i, ItemStack.EMPTY);
                 }
             }
         }
 
+        grave.setChanged();
         server.setBlockAndUpdate(grave.getBlockPos(), Blocks.AIR.defaultBlockState());
         server.playSound(null, player.blockPosition(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 1.0F, 1.0F);
     }
@@ -258,13 +261,35 @@ public class SimpleGrave extends BaseEntityBlock
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston)
     {
-        // grave logic HAS to be called before super,
-        // as super.onRemove clears the entity at this position
-        // TODO: Since the command to restore items has been added, this has to be removed to prevent item duping.
-        // prevent the block from being broken by normal means to avoid lost items
-        // or add in custom logic to handle that
-        // if (level.getBlockEntity(pos) instanceof SimpleGraveEntity grave)
-        //     grave.dropItems();
+        if(!state.is(newState.getBlock()))
+        {
+            BlockEntity blockEntity = level.getBlockEntity(pos);
+            if(blockEntity instanceof SimpleGraveEntity grave)
+            {
+                if(grave.getUuid() != null)
+                {
+                    GraveLogic.removeGrave(grave.getUuid(), GlobalPos.of(level.dimension(), pos));
+                }
+            }
+        }
         super.onRemove(state, level, pos, newState, movedByPiston);
+    }
+
+    @Override
+    public PushReaction getPistonPushReaction(BlockState state)
+    {
+        return PushReaction.BLOCK;
+    }
+
+    @Override
+    public float getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos)
+    {
+        return player.isCreative() ? super.getDestroyProgress(state, player, level, pos) : 0.0F;
+    }
+
+    @Override
+    public boolean canDropFromExplosion(BlockState state, BlockGetter level, BlockPos pos, net.minecraft.world.level.Explosion explosion)
+    {
+        return false;
     }
 }

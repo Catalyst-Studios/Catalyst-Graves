@@ -25,6 +25,7 @@ public class SimpleGraveEntity extends BlockEntity
     private UUID uuid;
     private String name = "Johnny";
     private Boolean glowing = false;
+    private boolean vitalityClaimed = false;
 
     public SimpleGraveEntity(BlockPos pos, BlockState blockState)
     {
@@ -36,21 +37,35 @@ public class SimpleGraveEntity extends BlockEntity
         uuid = inputUUID;
         name = inputName;
     }
+
     public UUID getUuid()
     {
         return uuid;
     }
+
     public String getName()
     {
         return name;
     }
 
+    public boolean isVitalityClaimed()
+    {
+        return vitalityClaimed;
+    }
+
+    public void setVitalityClaimed(boolean claimed)
+    {
+        this.vitalityClaimed = claimed;
+        this.setChanged();
+    }
+
     @SuppressWarnings("null")
     @Override
-    protected void saveAdditional(@SuppressWarnings("null") CompoundTag tag, @SuppressWarnings("null") HolderLookup.Provider registries)
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries)
     {
         super.saveAdditional(tag, registries);
         tag.putInt("count", this.items.size());
+        tag.putBoolean("VitalityClaimed", this.vitalityClaimed);
         if(uuid != null) tag.putString("uuid", uuid.toString());
         if(name != null) tag.putString("name", name);
         tag.putBoolean("glowing", glowing);
@@ -70,6 +85,7 @@ public class SimpleGraveEntity extends BlockEntity
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries)
     {
         super.loadAdditional(tag, registries);
+        this.vitalityClaimed = tag.getBoolean("VitalityClaimed");
         int count = tag.getInt("count");
         items = NonNullList.create();
 

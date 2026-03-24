@@ -56,21 +56,21 @@ public class CatalogueScreen extends AbstractContainerScreen<CatalogueMenu> impl
         this.imageHeight = 166;
         super.init();
 
-        addRenderableWidget(new CatalogueButton(this, getButtonX(1), getButtonY(1), 100, 16, CGAdvancementProvider.DESECRATE)).setCost(CGConfig.DESECRATE_COST.get());
-        addRenderableWidget(new CatalogueButton(this, getButtonX(2), getButtonY(2), 100, 16, CGAdvancementProvider.ORGANIZATION)).setCost(CGConfig.ORGANIZATION_COST.get());
-        addRenderableWidget(new CatalogueButton(this, getButtonX(3), getButtonY(3), 100, 16, CGAdvancementProvider.LESSER_VITALITY)).setCost(CGConfig.LESSER_VITALITY_COST.get());
-        addRenderableWidget(new CatalogueButton(this, getButtonX(4), getButtonY(4), 100, 16, CGAdvancementProvider.GREATER_VITALITY)).setCost(CGConfig.GREATER_VITALITY_COST.get());
-        addRenderableWidget(new CatalogueButton(this, getButtonX(5), getButtonY(5), 100, 16, CGAdvancementProvider.ILLUMINATION)).setCost(CGConfig.ILLUMINATION_COST.get());
-        addRenderableWidget(new CatalogueButton(this, getButtonX(6), getButtonY(6), 100, 16, CGAdvancementProvider.CORPOREAL_RECALL)).setCost(CGConfig.CORPOREAL_RECALL.get());
+        addRenderableWidget(new CatalogueButton(this, getX(1), getY(1), CGAdvancementProvider.DESECRATE)).setCost(CGConfig.DESECRATE_COST.get());
+        addRenderableWidget(new CatalogueButton(this, getX(2), getY(2), CGAdvancementProvider.ORGANIZATION)).setCost(CGConfig.ORGANIZATION_COST.get());
+        addRenderableWidget(new CatalogueButton(this, getX(3), getY(3), CGAdvancementProvider.LESSER_VITALITY)).setCost(CGConfig.LESSER_VITALITY_COST.get());
+        addRenderableWidget(new CatalogueButton(this, getX(4), getY(4), CGAdvancementProvider.GREATER_VITALITY)).setCost(CGConfig.GREATER_VITALITY_COST.get());
+        addRenderableWidget(new CatalogueButton(this, getX(5), getY(5), CGAdvancementProvider.ILLUMINATION)).setCost(CGConfig.ILLUMINATION_COST.get());
+        addRenderableWidget(new CatalogueButton(this, getX(6), getY(6), CGAdvancementProvider.CORPOREAL_RECALL)).setCost(CGConfig.CORPOREAL_RECALL.get());
 
         clientAdvancements.setListener(this);
     }
 
-    private int getButtonX(int index)
+    private int getX(int index)
     {
         return leftPos + ((index - 1) % 2) * 124 + 16;
     }
-    private int getButtonY(int index)
+    private int getY(int index)
     {
         return topPos + ((index - 1) / 2) * 32 + 36;
     }
@@ -82,16 +82,13 @@ public class CatalogueScreen extends AbstractContainerScreen<CatalogueMenu> impl
         int x = leftPos;
         int y = topPos;
 
-        // 1. DIBUJAR EL MARCO (CAPA MÁS PROFUNDA)
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, FRAME_TEXTURE);
-        // Dibujamos el marco un poco más grande (offset de 12px)
         guiGraphics.blit(FRAME_TEXTURE, x - 12, y - 12, 0, 0, 280, 190, 280, 190);
 
         ShaderInstance shader = ClientEvents.getStarrySkyShader();
         if(shader != null)
         {
-            // Pasamos el tiempo al uniforme del shader
             if(shader.getUniform("Time") != null)
             {
                 float totalTime = (Minecraft.getInstance().level.getGameTime() + partialTick) / 20.0F;
@@ -107,7 +104,6 @@ public class CatalogueScreen extends AbstractContainerScreen<CatalogueMenu> impl
                 DefaultVertexFormat.POSITION
             );
 
-            // Dibujamos el quad (rectángulo)
             bufferbuilder.addVertex(matrix4f, x, y + imageHeight, 0.0F);
             bufferbuilder.addVertex(matrix4f, x + imageWidth, y + imageHeight, 0.0F);
             bufferbuilder.addVertex(matrix4f, x + imageWidth, y, 0.0F);
@@ -116,38 +112,9 @@ public class CatalogueScreen extends AbstractContainerScreen<CatalogueMenu> impl
             BufferUploader.drawWithShader(bufferbuilder.buildOrThrow());
         }
 
-        // 3. BARRA DE EXPERIENCIA (CAPA SUPERIOR)
+
         renderExperienceBar(guiGraphics, x, y);
     }
-
-    // private void renderStarrySky(GuiGraphics guiGraphics, int x, int y, int w, int h)
-    // {
-    //     // Fondo base negro/azulado
-    //     guiGraphics.fill(x, y, x + w, y + h, 0xFF000008);
-
-    //     // Generamos "estrellas" usando una semilla fija por segundo para que no parpadeen locamente
-    //     // pero que tengan movimiento.
-    //     @SuppressWarnings("null")
-    //     long time = Minecraft.getInstance().level.getGameTime();
-    //     random.setSeed(42); // Semilla constante para la posición de las estrellas
-
-    //     for(int i = 0; i < 50; i++)
-    //     {
-    //         int starX = x + random.nextInt(w);
-    //         int starY = y + random.nextInt(h);
-
-    //         // Efecto de parpadeo individual
-    //         float twinkle = (Mth.sin((time + i * 7) * 0.1f) + 1.0f) / 2.0f;
-    //         int alpha = (int)(twinkle * 255);
-    //         int color = (alpha << 24) | 0xFFFFFF; // Blanco con transparencia variable
-
-    //         // Dibujamos un píxel (estrella)
-    //         if(random.nextFloat() > 0.1f)
-    //         {
-    //             guiGraphics.fill(starX, starY, starX + 1, starY + 1, color);
-    //         }
-    //     }
-    // }
 
     @SuppressWarnings("null")
     private void renderExperienceBar(GuiGraphics guiGraphics, int x, int y)
@@ -187,7 +154,6 @@ public class CatalogueScreen extends AbstractContainerScreen<CatalogueMenu> impl
         }
     }
 
-    // Métodos obligatorios de la interfaz Listener
     @Override
     public void onAddAdvancementRoot(@SuppressWarnings("null") AdvancementNode n)
     {

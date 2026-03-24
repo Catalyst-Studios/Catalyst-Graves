@@ -5,6 +5,7 @@ import com.natesky9.catalystgraves.Block.SimpleGraveEntity;
 import com.natesky9.catalystgraves.Init.CGBlocks;
 import com.natesky9.catalystgraves.client.menus.CatalogueMenu;
 import com.natesky9.catalystgraves.client.tooltip.CatalogueTooltipData;
+import com.natesky9.catalystgraves.datagen.CGAdvancementProvider;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.AdvancementHolder;
@@ -17,6 +18,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.ServerAdvancementManager;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -43,7 +45,7 @@ import java.util.Optional;
 
 /**
  * Main item for the Catalyst Graves mod.
- * Handles grave teleportation, remote recovery via Ender Chests, 
+ * Handles grave teleportation, remote recovery via Ender Chests,
  * and provides access to the Soulbinding interface.
  */
 public class GraveCatalogue extends Item implements MenuProvider
@@ -73,8 +75,7 @@ public class GraveCatalogue extends Item implements MenuProvider
             tooltipComponents.add(
                 Component.translatable(
                              "tooltip.catalystgraves.press_shift",
-                             Component.literal("SHIFT").withStyle(ChatFormatting.YELLOW)
-                             )
+                             Component.literal("SHIFT").withStyle(ChatFormatting.YELLOW))
                     .withStyle(ChatFormatting.DARK_GRAY));
         }
         super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
@@ -223,17 +224,30 @@ public class GraveCatalogue extends Item implements MenuProvider
         // Remote grave recovery via Ender Chest
         if(level.getBlockState(pos).is(Blocks.ENDER_CHEST))
         {
-            Optional<GlobalPos> death = player.getLastDeathLocation();
+            if(!(player instanceof ServerPlayer serverPlayer))
+                return InteractionResult.PASS;
+
+            ServerAdvancementManager manager = serverPlayer.server.getAdvancements();
+            AdvancementHolder corporealHolder = manager.get(CGAdvancementProvider.CORPOREAL_RECALL);
+            boolean hasCorporeal = corporealHolder != null && serverPlayer.getAdvancements().getOrStartProgress(corporealHolder).isDone();
+
+            if(!hasCorporeal)
+            {
+                return InteractionResult.PASS;
+            }
+
+            Optional<GlobalPos> death = serverPlayer.getLastDeathLocation();
             if(death.isEmpty())
-                return failsOnLocateGrave(player);
+                return failsOnLocateGrave(serverPlayer);
 
             BlockPos deathPos = death.get().pos();
             ServerLevel target = level.getServer().getLevel(death.get().dimension());
 
             if(target == null)
-                return graveFailLevelNull(player);
+                return graveFailLevelNull(serverPlayer);
+
             if(target.getBlockEntity(deathPos) instanceof SimpleGraveEntity grave)
-                recoversSuccesfullyGrave(player, target, deathPos, grave);
+                return recoversSuccesfullyGrave(serverPlayer, target, deathPos, grave);
         }
 
         return super.useOn(context);
