@@ -58,7 +58,7 @@ import java.util.*;
 public class GraveLogic extends SavedData
 {
     public static GraveLogic instance;
-    static Map<UUID, List<ItemStack>> soulboundItems = new HashMap<>(); 
+    static Map<UUID, List<ItemStack>> soulboundItems = new HashMap<>();
     public static Map<UUID, List<ItemStack>> deathSnapshot = new HashMap<>();
     public static Map<UUID, List<ItemStack>> curiosSnapshot = new HashMap<>();
     public static Map<UUID, List<GlobalPos>> activeGraves = new HashMap<>();
@@ -285,6 +285,9 @@ public class GraveLogic extends SavedData
     /**
      * Handles the placement of the grave block and transferring dropped items into it.
      */
+    /**
+     * Handles the placement of the grave block and transferring dropped items into it.
+     */
     public static void LivingDropsEvent(LivingDropsEvent event, ServerPlayer player)
     {
         Level level = player.level();
@@ -419,6 +422,22 @@ public class GraveLogic extends SavedData
         List<ItemStack> freshItems = new ArrayList<>();
         grave.setUuid(uuid, player.getScoreboardName());
 
+        int invSize = player.getInventory().getContainerSize();
+        grave.getItems().clear();
+        for(int i = 0; i < invSize; i++)
+        {
+            grave.getItems().add(ItemStack.EMPTY);
+        }
+
+        List<ItemStack> snapshot = new ArrayList<>();
+        if(deathSnapshot.containsKey(uuid))
+        {
+            for(ItemStack s : deathSnapshot.get(uuid))
+            {
+                snapshot.add(s.isEmpty() ? ItemStack.EMPTY : s.copy());
+            }
+        }
+
         for(ItemEntity entity : items)
         {
             ItemStack stack = entity.getItem();
@@ -452,9 +471,58 @@ public class GraveLogic extends SavedData
                 continue;
             }
 
-            grave.add(stack);
+            int originalSlot = -1;
+            for(int i = 0; i < snapshot.size(); i++)
+            {
+                ItemStack snapStack = snapshot.get(i);
+                if(!snapStack.isEmpty() && ItemStack.isSameItemSameComponents(snapStack, stack))
+                {
+                    if(snapStack.getCount() >= stack.getCount())
+                    {
+                        originalSlot = i;
+                        snapStack.shrink(stack.getCount());
+                        if(snapStack.isEmpty())
+                        {
+                            snapshot.set(i, ItemStack.EMPTY);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            if(originalSlot != -1 && originalSlot < invSize)
+            {
+                ItemStack currentInSlot = grave.getItems().get(originalSlot);
+                if(currentInSlot.isEmpty())
+                {
+                    grave.getItems().set(originalSlot, stack.copy());
+                }
+                else
+                {
+                    currentInSlot.grow(stack.getCount());
+                }
+            }
+            else
+            {
+                boolean placed = false;
+                for(int i = 0; i < grave.getItems().size(); i++)
+                {
+                    if(grave.getItems().get(i).isEmpty())
+                    {
+                        grave.getItems().set(i, stack.copy());
+                        placed = true;
+                        break;
+                    }
+                }
+                if(!placed)
+                {
+                    grave.getItems().add(stack.copy());
+                }
+            }
+
             event.getDrops().remove(entity);
         }
+
 
         if(soulboundItems.isEmpty())
         {
@@ -466,6 +534,8 @@ public class GraveLogic extends SavedData
             combined.addAll(freshItems);
             soulboundItems.put(uuid, combined);
         }
+
+        grave.setChanged();
     }
 
     /**

@@ -19,6 +19,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -196,23 +197,27 @@ public class SimpleGrave extends BaseEntityBlock
             grave.getCuriosItems().clear();
         }
 
-        for(int i = 0; i < player.getInventory().getContainerSize(); i++)
+        Inventory playerInv = player.getInventory();
+        int size = Math.min(playerInv.getContainerSize(), grave.getItems().size());
+
+        for(int i = 0; i < size; i++)
         {
-            if(i < grave.getItems().size())
+            ItemStack stacksInGrave = grave.getItems().get(i);
+
+            if(!stacksInGrave.isEmpty())
             {
-                ItemStack stackEnTumba = grave.getItems().get(i);
-                if(!stackEnTumba.isEmpty())
+                if(playerInv.getItem(i).isEmpty())
                 {
-                    if(player.getInventory().getItem(i).isEmpty())
-                    {
-                        player.getInventory().setItem(i, stackEnTumba.copy());
-                    }
-                    else
-                    {
-                        player.addItem(stackEnTumba.copy());
-                    }
-                    grave.getItems().set(i, ItemStack.EMPTY);
+                    playerInv.setItem(i, stacksInGrave.copy());
                 }
+                else
+                {
+                    if(!playerInv.add(stacksInGrave.copy()))
+                    {
+                        player.drop(stacksInGrave.copy(), true);
+                    }
+                }
+                grave.getItems().set(i, ItemStack.EMPTY);
             }
         }
 
