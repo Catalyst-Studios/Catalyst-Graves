@@ -49,8 +49,8 @@ public class CGAdvancementProvider implements AdvancementProvider.AdvancementGen
                                                              .build(SIMPLE_GRAVE);
     @SuppressWarnings("null")
     public static final AdvancementHolder lesser_vitality = Advancement.Builder.advancement()
-                                                                .display(Items.APPLE, Component.translatable("advancement.catalystgraves.vitality"),
-                                                                         Component.translatable("advancement.catalystgraves.vitality.description"), null,
+                                                                .display(Items.APPLE, Component.translatable("advancement.catalystgraves.lesser_vitality"),
+                                                                         Component.translatable("advancement.catalystgraves.lesser_vitality.description"), null,
                                                                          AdvancementType.GOAL, true, false, false)
                                                                 .addCriterion("unlock_vitality", unlock)
                                                                 .parent(simple_grave)

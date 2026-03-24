@@ -8,7 +8,7 @@
   "display": {
     "announce_to_chat": false,
     "description": {
-      "translate": "advancement.catalystgraves.vitality.description"
+      "translate": "advancement.catalystgraves.lesser_vitality.description"
     },
     "frame": "goal",
     "icon": {
@@ -16,7 +16,7 @@
       "id": "minecraft:apple"
     },
     "title": {
-      "translate": "advancement.catalystgraves.vitality"
+      "translate": "advancement.catalystgraves.lesser_vitality"
     }
   },
   "requirements": [
