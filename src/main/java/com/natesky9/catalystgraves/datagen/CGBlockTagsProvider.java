@@ -1,4 +1,4 @@
-package com.natesky9.DataGen;
+package com.natesky9.catalystgraves.datagen;
 
 import com.natesky9.catalystgraves.CatalystGraves;
 import net.minecraft.core.HolderLookup;
@@ -9,13 +9,16 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
-public class CGBlockTagsProvider extends BlockTagsProvider {
-    public CGBlockTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, @Nullable ExistingFileHelper existingFileHelper) {
+@SuppressWarnings("null")
+public class CGBlockTagsProvider extends BlockTagsProvider
+{
+    public CGBlockTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, @Nullable ExistingFileHelper existingFileHelper)
+    {
         super(output, lookupProvider, CatalystGraves.MODID, existingFileHelper);
     }
 
     @Override
-    protected void addTags(HolderLookup.Provider provider) {
-
+    protected void addTags(HolderLookup.Provider provider)
+    {
     }
 }

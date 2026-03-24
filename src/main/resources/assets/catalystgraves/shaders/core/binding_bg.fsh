@@ -2,7 +2,7 @@
 
 uniform float Time;
 uniform vec4 ColorModulator;
-uniform float IsValid; // Ahora recibe una transición suave desde Java
+uniform float IsValid;
 
 uniform sampler2D Sampler0; 
 
@@ -28,7 +28,7 @@ float noise(vec2 p){
 float fbm( vec2 p )
 {
     float f = 0.0;
-    // Eliminado el incremento de velocidad. Ahora es constante y calmado.
+    // Eliminado el incremento de velocidad.
     float iTime = Time * 0.5; 
     
     f += 0.500000 * noise( p + iTime ); p = mtx * p * 2.02;
@@ -47,15 +47,12 @@ float pattern( in vec2 p )
 }
 
 vec4 colormap(float x) {
-    // Colores "Válidos" (Cyan y Magentas)
     vec4 good_low = vec4(0.01, 0.41, 0.51, 1.0);
     vec4 good_mid = vec4(0.50, 0.10, 0.30, 1.0);
     
-    // Colores "Inválidos" (Rojos y Oscuros)
     vec4 bad_low = vec4(0.20, 0.0, 0.0, 1.0);
     vec4 bad_mid = vec4(0.60, 0.10, 0.0, 1.0);
     
-    // Al pasar un valor interpolado (colorTransition), el mix será un degradado suave
     vec4 color_low = mix(bad_low, good_low, IsValid);
     vec4 color_mid = mix(bad_mid, good_mid, IsValid);
     vec4 color_high = vec4(1.0, 1.0, 1.0, 1.0); 

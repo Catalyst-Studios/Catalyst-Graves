@@ -1,4 +1,4 @@
-package com.natesky9.catalystgraves.Menus;
+package com.natesky9.catalystgraves.client.menus;
 
 import com.natesky9.catalystgraves.CatalystGraves;
 import io.netty.buffer.ByteBuf;
@@ -15,37 +15,42 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.List;
 
-public record CataloguePacket(String name, int cost) implements CustomPacketPayload {
+@SuppressWarnings("null")
+public record CataloguePacket(String name, int cost) implements CustomPacketPayload
+{
     public static final CustomPacketPayload.Type<CataloguePacket> TYPE = new CustomPacketPayload.Type<>(
-            ResourceLocation.fromNamespaceAndPath(CatalystGraves.MODID,"catalogue_selection"));
+        ResourceLocation.fromNamespaceAndPath(CatalystGraves.MODID, "catalogue_selection"));
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public Type<? extends CustomPacketPayload> type()
+    {
         return TYPE;
     }
-    public static final StreamCodec<ByteBuf,CataloguePacket> STREAM_CODEC =
-            StreamCodec.composite(ByteBufCodecs.STRING_UTF8,CataloguePacket::name,
-                    ByteBufCodecs.INT,CataloguePacket::cost,
-                    CataloguePacket::new);
+    public static final StreamCodec<ByteBuf, CataloguePacket> STREAM_CODEC =
+        StreamCodec.composite(ByteBufCodecs.STRING_UTF8, CataloguePacket::name,
+                              ByteBufCodecs.INT, CataloguePacket::cost,
+                              CataloguePacket::new);
     //
-    public static class ClientPayloadHandler {
+    public static class ClientPayloadHandler
+    {
         public static void handleData(final CataloguePacket packet, final IPayloadContext context)
         {
             /*System.out.println("client payload");*/
-            //we shouldn't need this, since the catalogue only sends client -> server
+            // we shouldn't need this, since the catalogue only sends client -> server
         }
     }
     //
-    public static class ServerPayloadHandler {
+    public static class ServerPayloadHandler
+    {
         public static void handleData(final CataloguePacket packet, final IPayloadContext context)
         {
             System.out.println(packet.name);
             ResourceLocation name = ResourceLocation.parse(packet.name);
-            ServerPlayer player = (ServerPlayer) context.player();
+            ServerPlayer player = (ServerPlayer)context.player();
             PlayerAdvancements advancements = player.getAdvancements();
 
             ServerAdvancementManager manager = player.getServer().getAdvancements();
             AdvancementHolder holder = manager.get(name);
-            if (holder == null)
+            if(holder == null)
             {
                 /*System.out.println("Something wrong with the resource location: " + name);*/
                 return;
@@ -54,7 +59,7 @@ public record CataloguePacket(String name, int cost) implements CustomPacketPayl
             //
             int cost = packet.cost;
             int playerLevel = player.experienceLevel;
-            if (cost > playerLevel)
+            if(cost > playerLevel)
             {
                 /*System.out.println("Cost is higher than player level! "
                 + "How did you manage that?");*/
@@ -62,11 +67,11 @@ public record CataloguePacket(String name, int cost) implements CustomPacketPayl
             }
             player.giveExperienceLevels(-cost);
             //
-            for (List<String> requirements:advancement.requirements().requirements())
+            for(List<String> requirements : advancement.requirements().requirements())
             {
-                for (String string:requirements)
+                for(String string : requirements)
                 {
-                    advancements.award(holder,string);
+                    advancements.award(holder, string);
                 }
             }
         }

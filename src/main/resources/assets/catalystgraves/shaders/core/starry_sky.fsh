@@ -5,7 +5,6 @@ uniform vec4 ColorModulator;
 //in vec4 vertexColor;
 out vec4 fragColor;
 
-// --- Simplex Noise 3D ---
 vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
 vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
 vec4 permute(vec4 x) { return mod289(((x * 34.0) + 1.0) * x); }
@@ -71,16 +70,13 @@ void main()
         
         structure += lines * 0.15 * (1.0 - (i / 32.0));
         
-        // 3. ESTRELLAS EN LOS FILAMENTOS
         float stars = pow(max(0.0, snoise(p * 20.0)), 15.0);
         star_accumulation += stars * lines * 1.5; 
     }
 
     vec3 finalColor = mix(color_void, color_star, min(structure, 1.0));
-    // Añadimos la luz de las estrellas del cúmulo
     finalColor += vec3(star_accumulation);
-    
-    // Estrellas de fondo generales
+
     float bg_stars = pow(max(0.0, snoise(cam * 10.0 + rd * 10.0)), 10.0);
     finalColor += bg_stars * 0.3;
 

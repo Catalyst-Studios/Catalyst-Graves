@@ -8,15 +8,15 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-public class CGBlockEntities {
-
+@SuppressWarnings("null")
+public class CGBlockEntities
+{
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
-            DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, CatalystGraves.MODID);
+        DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, CatalystGraves.MODID);
     //
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<SimpleGraveEntity>> SIMPLE_GRAVE =
-            BLOCK_ENTITIES.register("simple_grave",
-                    () -> BlockEntityType.Builder.of(SimpleGraveEntity::new,
-                            CGBlocks.SIMPLE_GRAVE.get()).build(null));
+        BLOCK_ENTITIES.register("simple_grave",
+                                () -> BlockEntityType.Builder.of(SimpleGraveEntity::new, CGBlocks.SIMPLE_GRAVE.get()).build(null));
     //
     public static void register(IEventBus eventBus)
     {

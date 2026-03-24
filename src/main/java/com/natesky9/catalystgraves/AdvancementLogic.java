@@ -9,23 +9,26 @@ import net.minecraft.server.level.ServerPlayer;
 
 import java.util.List;
 
-public class AdvancementLogic {
+public class AdvancementLogic
+{
+    @SuppressWarnings("null")
     public static void grant(ServerPlayer player, ResourceLocation resourceLocation)
     {
-        //all this just to grant an advancement
+        // all this just to grant an advancement
         PlayerAdvancements advancements = player.getAdvancements();
         ServerAdvancementManager manager = player.server.getAdvancements();
         AdvancementHolder holder = manager.get(resourceLocation);
         Advancement advancement = manager.tree().get(holder).advancement();
-        for (List<String> requirements:advancement.requirements().requirements())
+        for(List<String> requirements : advancement.requirements().requirements())
         {
-            for (String string:requirements)
+            for(String string : requirements)
             {
-                advancements.award(holder,string);
+                advancements.award(holder, string);
             }
         }
     }
 
+    @SuppressWarnings("null")
     public static boolean hasAdvancement(ServerPlayer player, ResourceLocation value)
     {
         ServerAdvancementManager manager = player.server.getAdvancements();

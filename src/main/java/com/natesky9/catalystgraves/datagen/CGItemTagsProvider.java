@@ -1,4 +1,4 @@
-package com.natesky9.DataGen;
+package com.natesky9.catalystgraves.datagen;
 
 import com.natesky9.catalystgraves.CatalystGraves;
 import net.minecraft.core.HolderLookup;
@@ -15,19 +15,23 @@ import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
 import java.util.concurrent.CompletableFuture;
 
-public class CGItemTagsProvider extends ItemTagsProvider {
+@SuppressWarnings("null")
+public class CGItemTagsProvider extends ItemTagsProvider
+{
     public static TagKey<Item> SOULBOUND_APPLICABLE = ItemTags.create(ResourceLocation
-            .fromNamespaceAndPath(CatalystGraves.MODID,"soulbound_applicable"));
+                                                                          .fromNamespaceAndPath(CatalystGraves.MODID, "soulbound_applicable"));
     public CGItemTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider,
-                              CompletableFuture<TagLookup<Block>> blockTags, ExistingFileHelper helper) {
-        super(output, lookupProvider,blockTags,CatalystGraves.MODID,helper);
+                              CompletableFuture<TagLookup<Block>> blockTags, ExistingFileHelper helper)
+    {
+        super(output, lookupProvider, blockTags, CatalystGraves.MODID, helper);
     }
 
     @Override
-    protected void addTags(HolderLookup.Provider provider) {
+    protected void addTags(HolderLookup.Provider provider)
+    {
         tag(SOULBOUND_APPLICABLE)
-                .addTag(Tags.Items.ENCHANTABLES)
-                .addTag(Tags.Items.SHULKER_BOXES)
-                .add(Items.BUNDLE);
+            .addTag(Tags.Items.ENCHANTABLES)
+            .addTag(Tags.Items.SHULKER_BOXES)
+            .add(Items.BUNDLE);
     }
 }

@@ -7,13 +7,14 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-public class CGItems {
+@SuppressWarnings("null")
+public class CGItems
+{
     public static final DeferredRegister.Items ITEMS =
-            DeferredRegister.createItems(CatalystGraves.MODID);
+        DeferredRegister.createItems(CatalystGraves.MODID);
     //
     public static final DeferredItem<Item> GRAVE_CATALOGUE = ITEMS.register("catalogue",
-            () -> new GraveCatalogue(new Item.Properties()
-                    .stacksTo(1)));
+                                                                            () -> new GraveCatalogue(new Item.Properties().stacksTo(1)));
     //
     public static void register(IEventBus eventBus)
     {

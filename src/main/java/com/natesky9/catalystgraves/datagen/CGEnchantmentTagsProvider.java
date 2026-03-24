@@ -1,4 +1,4 @@
-package com.natesky9.DataGen;
+package com.natesky9.catalystgraves.datagen;
 
 import com.natesky9.catalystgraves.CatalystGraves;
 import com.natesky9.catalystgraves.Init.CGEnchantments;
@@ -13,18 +13,22 @@ import net.minecraft.world.item.enchantment.Enchantments;
 
 import java.util.concurrent.CompletableFuture;
 
-public class CGEnchantmentTagsProvider extends EnchantmentTagsProvider {
+@SuppressWarnings("null")
+public class CGEnchantmentTagsProvider extends EnchantmentTagsProvider
+{
     public static TagKey<Enchantment> VANISHING_EXCLUSIVE = TagKey.create(Registries.ENCHANTMENT,
-            ResourceLocation.fromNamespaceAndPath(CatalystGraves.MODID,"exclusive_set/vanishing"));
+                                                                          ResourceLocation.fromNamespaceAndPath(CatalystGraves.MODID, "exclusive_set/vanishing"));
 
-    public CGEnchantmentTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+    public CGEnchantmentTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider)
+    {
         super(output, lookupProvider);
     }
 
     @Override
-    protected void addTags(HolderLookup.Provider provider) {
+    protected void addTags(HolderLookup.Provider provider)
+    {
         tag(VANISHING_EXCLUSIVE)
-                .add(Enchantments.VANISHING_CURSE)
-                .addOptional(CGEnchantments.SOULBOUND.location());
+            .add(Enchantments.VANISHING_CURSE)
+            .addOptional(CGEnchantments.SOULBOUND.location());
     }
 }

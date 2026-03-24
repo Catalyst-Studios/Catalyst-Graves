@@ -1,4 +1,4 @@
-package com.natesky9.DataGen;
+package com.natesky9.catalystgraves.datagen;
 
 import com.natesky9.catalystgraves.CatalystGraves;
 import com.natesky9.catalystgraves.Init.CGEnchantments;
@@ -11,7 +11,9 @@ import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-public class CGDatapackProvider {
+@SuppressWarnings("null")
+public class CGDatapackProvider
+{
     public static DatapackBuiltinEntriesProvider Make(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider)
     {
 

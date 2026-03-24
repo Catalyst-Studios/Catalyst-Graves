@@ -1,4 +1,4 @@
-package com.natesky9.DataGen;
+package com.natesky9.catalystgraves.datagen;
 
 import com.natesky9.catalystgraves.CatalystGraves;
 import net.minecraft.data.PackOutput;
