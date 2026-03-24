@@ -31,17 +31,18 @@ import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
+@SuppressWarnings("null")
 public class CatalogueScreen extends AbstractContainerScreen<CatalogueMenu> implements ClientAdvancements.Listener
 {
     private static final ResourceLocation FRAME_TEXTURE =
-        ResourceLocation.fromNamespaceAndPath(CatalystGraves.MODID, "textures/gui/catalogue_frame.png");
+        ResourceLocation.fromNamespaceAndPath(CatalystGraves.MODID, "textures/gui/catalogue.png");
     private static final ResourceLocation XP_BAR =
         ResourceLocation.fromNamespaceAndPath(CatalystGraves.MODID, "textures/gui/xp_bar.png");
 
     public Player player;
     ClientAdvancements clientAdvancements;
 
-    @SuppressWarnings("null")
+    
     public CatalogueScreen(CatalogueMenu menu, Inventory playerInventory, Component title)
     {
         super(menu, playerInventory, title);
@@ -75,7 +76,7 @@ public class CatalogueScreen extends AbstractContainerScreen<CatalogueMenu> impl
         return topPos + ((index - 1) / 2) * 32 + 36;
     }
 
-    @SuppressWarnings("null")
+    
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY)
     {
@@ -116,7 +117,7 @@ public class CatalogueScreen extends AbstractContainerScreen<CatalogueMenu> impl
         renderExperienceBar(guiGraphics, x, y);
     }
 
-    @SuppressWarnings("null")
+    
     private void renderExperienceBar(GuiGraphics guiGraphics, int x, int y)
     {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
@@ -126,7 +127,7 @@ public class CatalogueScreen extends AbstractContainerScreen<CatalogueMenu> impl
         guiGraphics.drawCenteredString(font, String.valueOf(player.experienceLevel), xpX, xpY - 12, 0x80FF20);
     }
 
-    @SuppressWarnings("null")
+    
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick)
     {
@@ -134,7 +135,7 @@ public class CatalogueScreen extends AbstractContainerScreen<CatalogueMenu> impl
         this.renderTooltip(guiGraphics, mouseX, mouseY);
     }
 
-    @SuppressWarnings("null")
+    
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY)
     {
@@ -142,7 +143,7 @@ public class CatalogueScreen extends AbstractContainerScreen<CatalogueMenu> impl
     }
 
     @Override
-    public void onUpdateAdvancementProgress(@SuppressWarnings("null") AdvancementNode node, @SuppressWarnings("null") AdvancementProgress progress)
+    public void onUpdateAdvancementProgress( AdvancementNode node,  AdvancementProgress progress)
     {
         for(Renderable r : renderables)
         {
@@ -155,19 +156,19 @@ public class CatalogueScreen extends AbstractContainerScreen<CatalogueMenu> impl
     }
 
     @Override
-    public void onAddAdvancementRoot(@SuppressWarnings("null") AdvancementNode n)
+    public void onAddAdvancementRoot( AdvancementNode n)
     {
     }
     @Override
-    public void onRemoveAdvancementRoot(@SuppressWarnings("null") AdvancementNode n)
+    public void onRemoveAdvancementRoot( AdvancementNode n)
     {
     }
     @Override
-    public void onAddAdvancementTask(@SuppressWarnings("null") AdvancementNode n)
+    public void onAddAdvancementTask( AdvancementNode n)
     {
     }
     @Override
-    public void onRemoveAdvancementTask(@SuppressWarnings("null") AdvancementNode n)
+    public void onRemoveAdvancementTask( AdvancementNode n)
     {
     }
     @Override
@@ -175,7 +176,7 @@ public class CatalogueScreen extends AbstractContainerScreen<CatalogueMenu> impl
     {
     }
     @Override
-    public void onSelectedTabChanged(@SuppressWarnings("null") @Nullable AdvancementHolder h)
+    public void onSelectedTabChanged( @Nullable AdvancementHolder h)
     {
     }
 }
