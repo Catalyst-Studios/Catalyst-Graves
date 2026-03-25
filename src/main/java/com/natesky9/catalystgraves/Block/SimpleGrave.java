@@ -109,8 +109,8 @@ public class SimpleGrave extends BaseEntityBlock
                 return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
             }
             else if(level instanceof ServerLevel)
-                player.sendSystemMessage(Component.literal("Crouch to break chest and get contents")
-                                             .withStyle(ChatFormatting.BLUE));
+                player.sendSystemMessage(Component.translatable("message.catalystgraves.crouch_to_break")
+                                  .withStyle(ChatFormatting.BLUE));
         }
         return false;
     }

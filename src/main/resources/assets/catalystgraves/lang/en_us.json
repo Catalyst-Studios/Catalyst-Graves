@@ -32,6 +32,8 @@
   "string.grave.fail.nondeath": "No previous death location!",
   "string.grave.fail.levelnull": "you died in a level that doesn't exist anymore?",
   "string.grave.fail.no_advancement": "You need Corporeal Recall to use this feature",
+  "gui.catalystgraves.insufficient_levels": "Insufficient Levels! (Requires: %s)",
+  "message.catalystgraves.crouch_to_break": "Crouch to break chest and get contents",
   "commands.catalystgraves.find.empty": "No active graves found for %s",
   "commands.catalystgraves.find.header": "Graves from %s:",
   "commands.catalystgraves.find.entry": "- Grave %s --> <%s, %s, %s>",

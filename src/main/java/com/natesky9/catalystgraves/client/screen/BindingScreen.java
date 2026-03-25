@@ -33,9 +33,9 @@ public class BindingScreen extends AbstractContainerScreen<BindingMenu>
     private static final ResourceLocation TEXTURE =
         ResourceLocation.fromNamespaceAndPath(CatalystGraves.MODID, "textures/gui/binding.png");
 
-    private static final ResourceLocation FRAME_TEXTURE =
-        ResourceLocation.fromNamespaceAndPath(CatalystGraves.MODID, "textures/gui/binding_frame.png");
-    
+    // private static final ResourceLocation FRAME_TEXTURE =
+    //     ResourceLocation.fromNamespaceAndPath(CatalystGraves.MODID, "textures/gui/binding_2.png");
+
     // Constants for timing
     private static final int MAX_WINDUP = 40; // 2 seconds (20 ticks * 2)
     private static final int ERROR_DISPLAY_TICKS = 100; // 5 seconds (20 ticks * 5)
@@ -59,10 +59,10 @@ public class BindingScreen extends AbstractContainerScreen<BindingMenu>
     {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.setShaderTexture(0, FRAME_TEXTURE);
-        
+        // RenderSystem.setShaderTexture(0, FRAME_TEXTURE);
+
         // Draw the outer frame
-        guiGraphics.blit(FRAME_TEXTURE, leftPos - 12, topPos - 12, 0, 0, imageWidth + 24, imageHeight + 24, 280, 190);
+        // guiGraphics.blit(FRAME_TEXTURE, leftPos - 12, topPos - 12, 0, 0, imageWidth + 24, imageHeight + 24, 280, 190);
 
         boolean isEnchantable = false;
         if(hoveredSlot != null && !hoveredSlot.getItem().isEmpty())
@@ -136,16 +136,16 @@ public class BindingScreen extends AbstractContainerScreen<BindingMenu>
         {
             leftDown = false;
             Slot slot = getSlotUnderMouse();
-            
+
             if(slot != null && slot == clickedSlot)
             {
                 // If the 2-second windup is complete
-                if(menu.windup >= MAX_WINDUP - 2) 
+                if(menu.windup >= MAX_WINDUP - 2)
                 {
                     // Check for player levels before sending the packet
                     if(minecraft.player.experienceLevel < LEVEL_COST)
                     {
-                        this.errorMessage = Component.literal("Insufficient Levels! (Requires: " + LEVEL_COST + ")");
+                        this.errorMessage = Component.translatable("gui.catalystgraves.insufficient_levels", LEVEL_COST);
                         this.errorTimer = ERROR_DISPLAY_TICKS;
                     }
                     else
@@ -158,22 +158,17 @@ public class BindingScreen extends AbstractContainerScreen<BindingMenu>
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
-    
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick)
     {
-        // 1. Render the dark background behind the GUI
-        this.renderBackground(guiGraphics, mouseX, mouseY, partialTick); 
-        
-        // 2. Render background texture, slots, and labels
+        this.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
+
         super.render(guiGraphics, mouseX, mouseY, partialTick);
 
-        // --- ANIMATION LOGIC ---
-        // Increment windup if mouse is held over the same slot, otherwise decrement
         menu.windup += (leftDown && hoveredSlot == clickedSlot) ? 1 : -1;
         menu.windup = Mth.clamp(menu.windup, 0, MAX_WINDUP);
         menu.clock += getMenu().windup;
-        
+
         int rotation = ((int)minecraft.level.getGameTime() % 360) + getMenu().clock / 2;
 
         if(hoveredSlot != null && !hoveredSlot.getItem().isEmpty())
@@ -181,20 +176,19 @@ public class BindingScreen extends AbstractContainerScreen<BindingMenu>
             ItemStack stack = hoveredSlot.getItem();
             boolean canEnchant = stack.is(CGItemTagsProvider.SOULBOUND_APPLICABLE);
 
-            // --- RENDER FLOATING ROTATING ITEM ---
             PoseStack poseStack = guiGraphics.pose();
             poseStack.pushPose();
-            // Coordinates relative to the screen
+
             poseStack.translate(leftPos + imageWidth / 2f, topPos + 40, 32);
             poseStack.scale(2, 2, 2);
-            if(canEnchant) {
+            if(canEnchant)
+            {
                 poseStack.mulPose(Axis.YP.rotationDegrees(rotation));
             }
             poseStack.translate(-8, -8, -150);
             guiGraphics.renderItem(stack, 0, 0, 0);
             poseStack.popPose();
 
-            // --- RENDER ERROR TEXT (Tags check) ---
             if(!canEnchant)
             {
                 int x = leftPos + imageWidth / 2;
@@ -203,7 +197,6 @@ public class BindingScreen extends AbstractContainerScreen<BindingMenu>
             }
         }
 
-        // --- RENDER TEMPORARY ERROR MESSAGE (Level check) ---
         if(errorTimer > 0)
         {
             int x = leftPos + imageWidth / 2;
@@ -212,11 +205,9 @@ public class BindingScreen extends AbstractContainerScreen<BindingMenu>
             errorTimer--;
         }
 
-        // 3. Render tooltips last to ensure they are on top
         renderTooltip(guiGraphics, mouseX, mouseY);
     }
 
-    
     @Override
     protected void slotClicked(Slot slot, int slotId, int mouseButton, ClickType type)
     {
@@ -236,7 +227,6 @@ public class BindingScreen extends AbstractContainerScreen<BindingMenu>
         guiGraphics.drawString(this.font, this.playerInventoryTitle, 8, this.imageHeight - 90, 0x404040, false);
     }
 
-    
     @Override
     protected void renderSlot(GuiGraphics guiGraphics, Slot slot)
     {
