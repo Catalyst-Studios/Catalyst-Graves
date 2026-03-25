@@ -2,7 +2,9 @@
 
 uniform float Time;
 uniform vec4 ColorModulator;
-//in vec4 vertexColor;
+uniform sampler2D Sampler0;
+
+in vec2 texCoord0;
 out vec4 fragColor;
 
 vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
@@ -45,7 +47,7 @@ float snoise(vec3 v) {
 void main()
 {
 
-    vec2 uv = gl_FragCoord.xy / 1000.0; 
+    vec2 uv = texCoord0; 
 
     vec3 color_star = vec3(0.78, 0.15, 0.07); //Red-ish
     vec3 color_void = vec3(0.0, 0.0, 0.0); //Black 
@@ -54,7 +56,7 @@ void main()
     float movement_scale = 1.5;
     vec2 xy_motion = vec2(cos(Time * movement_speed), sin(Time * movement_speed)) * movement_scale;
     
-    vec3 cam = vec3(xy_motion, Time * 0.005); 
+    vec3 cam = vec3(uv * 2.5 + xy_motion, Time * 0.005); 
     vec3 rd = normalize(vec3(uv - 0.5, 1.0));
 
     float structure = 0.0;
@@ -74,11 +76,24 @@ void main()
         star_accumulation += stars * lines * 1.5; 
     }
 
-    vec3 finalColor = mix(color_void, color_star, min(structure, 1.0));
-    finalColor += vec3(star_accumulation);
+    vec3 skyColor = mix(color_void, color_star, min(structure, 1.0));
+    skyColor += vec3(star_accumulation);
 
     float bg_stars = pow(max(0.0, snoise(cam * 10.0 + rd * 10.0)), 10.0);
-    finalColor += bg_stars * 0.3;
+    skyColor += bg_stars * 0.3;
 
-    fragColor = vec4(finalColor, 1.0) * ColorModulator;
+    vec4 baseTexture = texture(Sampler0, texCoord0);
+    if (baseTexture.a < 0.1) discard;
+
+    float shaderStrength = 1.0;// 0.0 to 2.0
+    float textureAlpha = 0.5;// 0.0 to 1.0
+    float colorImpact = 0.8;// 0.0 to 1.0
+
+    float luminance = dot(baseTexture.rgb, vec3(0.299, 0.587, 0.114));
+
+    vec3 tintedShader = mix(skyColor, skyColor * baseTexture.rgb * 2.0, colorImpact);
+
+    vec3 finalColor = (tintedShader * shaderStrength) + (baseTexture.rgb * textureAlpha);
+
+    fragColor = vec4(finalColor, baseTexture.a) * ColorModulator;
 }

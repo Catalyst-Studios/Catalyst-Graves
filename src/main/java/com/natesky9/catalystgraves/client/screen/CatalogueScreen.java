@@ -35,7 +35,9 @@ import org.joml.Matrix4f;
 public class CatalogueScreen extends AbstractContainerScreen<CatalogueMenu> implements ClientAdvancements.Listener
 {
     private static final ResourceLocation FRAME_TEXTURE =
-        ResourceLocation.fromNamespaceAndPath(CatalystGraves.MODID, "textures/gui/catalogue.png");
+        ResourceLocation.fromNamespaceAndPath(CatalystGraves.MODID, "textures/gui/frame.png");
+    private static final ResourceLocation PAGES_TEXTURE =
+        ResourceLocation.fromNamespaceAndPath(CatalystGraves.MODID, "textures/gui/pages.png");
     private static final ResourceLocation XP_BAR =
         ResourceLocation.fromNamespaceAndPath(CatalystGraves.MODID, "textures/gui/xp_bar.png");
 
@@ -85,7 +87,7 @@ public class CatalogueScreen extends AbstractContainerScreen<CatalogueMenu> impl
 
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, FRAME_TEXTURE);
-        guiGraphics.blit(FRAME_TEXTURE, x - 12, y - 12, 0, 0, 280, 190, 280, 190);
+        guiGraphics.blit(FRAME_TEXTURE, x - 12, y - 17, 0, 0, 280, 200, 280, 200);
 
         ShaderInstance shader = ClientEvents.getStarrySkyShader();
         if(shader != null)
@@ -97,22 +99,33 @@ public class CatalogueScreen extends AbstractContainerScreen<CatalogueMenu> impl
             }
 
             RenderSystem.setShader(() -> shader);
-            
+            RenderSystem.setShaderTexture(0, PAGES_TEXTURE);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+
             Matrix4f matrix4f = guiGraphics.pose().last().pose();
             Tesselator tesselator = Tesselator.getInstance();
             BufferBuilder bufferbuilder = tesselator.begin(
-                VertexFormat.Mode.QUADS, 
-                DefaultVertexFormat.POSITION
-            );
+                VertexFormat.Mode.QUADS,
+                DefaultVertexFormat.POSITION_TEX);
 
-            bufferbuilder.addVertex(matrix4f, x, y + imageHeight, 0.0F);
-            bufferbuilder.addVertex(matrix4f, x + imageWidth, y + imageHeight, 0.0F);
-            bufferbuilder.addVertex(matrix4f, x + imageWidth, y, 0.0F);
-            bufferbuilder.addVertex(matrix4f, x, y, 0.0F);
+            float u1 = 0.0F;
+            float u2 = 1.0F;
+            float v1 = 0.0F;
+            float v2 = 1.0F;
+            int width = 258;
+            int height = 171;
+
+            bufferbuilder.addVertex(matrix4f, x, y + height, 0.0F).setUv(u1, v2);
+            bufferbuilder.addVertex(matrix4f, x + width, y + height, 0.0F).setUv(u2, v2);
+            bufferbuilder.addVertex(matrix4f, x + width, y, 0.0F).setUv(u2, v1);
+            bufferbuilder.addVertex(matrix4f, x, y, 0.0F).setUv(u1, v1);
 
             BufferUploader.drawWithShader(bufferbuilder.buildOrThrow());
         }
-
+        else
+        {
+            guiGraphics.blit(PAGES_TEXTURE, x, y, 0, 0, 258, 171, 258, 171);
+        }
 
         renderExperienceBar(guiGraphics, x, y);
     }
