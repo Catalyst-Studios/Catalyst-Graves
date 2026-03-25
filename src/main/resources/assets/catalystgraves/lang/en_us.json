@@ -3,8 +3,8 @@
   "advancement.catalystgraves.root.description": "Sleep while holding a book and quill to unlock your first grave",
   "advancement.catalystgraves.grave": "Simple Grave",
   "advancement.catalystgraves.grave.description": "Your items are placed in a grave upon death",
-  "advancement.catalystgraves.vitality": "Lesser Vitality",
-  "advancement.catalystgraves.vitality.description": "Restorative effects upon reclaiming your grave",
+  "advancement.catalystgraves.lesser_vitality": "Lesser Vitality",
+  "advancement.catalystgraves.lesser_vitality.description": "Restorative effects upon reclaiming your grave",
   "advancement.catalystgraves.greater_vitality": "Greater Vitality",
   "advancement.catalystgraves.greater_vitality.description": "Your grave grants you a veil of protection",
   "advancement.catalystgraves.illumination": "Illumination",
@@ -31,14 +31,26 @@
   "string.grave.fail": "Grave does not exist",
   "string.grave.fail.nondeath": "No previous death location!",
   "string.grave.fail.levelnull": "you died in a level that doesn't exist anymore?",
-  "string.command.find.fail": "%1$s doesn't have a previous death location! This may be a bug with another mod",
-  "string.command.find.success": "Grave of %1$s is located at\n%2$s\nClick here to teleport",
-  "string.command.restore.fail": "Block at expected position is not a grave!\nClick here to recover contents",
-  "string.command.restore.success": "Items restored and grave cleared",
-  "string.command.recover.suggest": "/grave recover %1$s",
+  "string.grave.fail.no_advancement": "You need Corporeal Recall to use this feature",
+  "gui.catalystgraves.insufficient_levels": "Insufficient Levels! (Requires: %s)",
+  "message.catalystgraves.crouch_to_break": "Crouch to break chest and get contents",
+  "commands.catalystgraves.find.empty": "No active graves found for %s",
+  "commands.catalystgraves.find.header": "Graves from %s:",
+  "commands.catalystgraves.find.entry": "- Grave %s --> <%s, %s, %s>",
+  "commands.catalystgraves.find.hover.tp": "Corporeal Recall active! Click to Teleport.",
+  "commands.catalystgraves.find.hover.suggest": "Click to suggest TP (Requires Corporeal Recall)",
+  
+  "commands.catalystgraves.restore.no_graves": "No graves registered for this user.",
+  "commands.catalystgraves.restore.invalid_index": "Invalid grave index.",
+  "commands.catalystgraves.restore.success": "Grave restored successfully.",
+  
+  "commands.catalystgraves.recover.no_snapshot": "No snapshot available for %s",
+  "commands.catalystgraves.recover.success": "Inventory snapshot returned to %s",
+
+  "chat.catalystgraves.death_notice": "You died at %s, %s, %s.",
+  "chat.catalystgraves.click_to_tp": "[Click here to Teleport]",
 
   "string.command.help.root": "Commands for Catalyst Graves\n\n/grave find [player]: outputs the location of a grave\n/grave restore [player]: gives the player items from their grave\n/grave recover [player] retrieves a copy of a player's death snapshot",
-
   "string.command.help.find": "Search for the player's last grave, and output the dimension + coordinates. This checks for an active grave and fails if one is not at the expected location.\n\nIf a grave is not present, consider using /recover to get a copy of the player's latest death snapshot",
   "string.command.help.restore": "Restores a player's active grave if they cannot recover it. This empties the active grave at their last death position, spits the items at their feet, and places a marker there the grave was previously. If this command fails, consider using /recover to get a copy of the player's last death snapshot",
   "string.command.help.recover": "/grave recover [player]\nGive a copy of the player's latest death snapshot in the form of a set of chests. This contains all the items that were not soulbound, as those are restore to the player upon respawning.\"",
@@ -73,5 +85,8 @@
   "catalystgraves.organization": "Organization",
   "catalystgraves.illumination": "Illumination",
 
-  "enchantment.catalystgraves.soulbound": "Soulbound"
+  "enchantment.catalystgraves.soulbound": "Soulbound",
+
+  "tooltip.catalystgraves.press_shift": "Press %s to see more info!",
+  "tooltip.catalystgraves.catalogue.info": "Right click on a enchanting table to get Soulbound items or right click on the air to upgrade the grave"
 }
