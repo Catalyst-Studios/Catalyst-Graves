@@ -1,9 +1,9 @@
-# Catalyst-Graves
 
-A simple grave mod that includes different tier of graves, upgrades and more.
 
 <div align="center">
-
+  <h2></h>Catalyst Graves</h3>
+  <p>A simple grave mod that includes different tier of graves, upgrades and more.</p>
+  <br>
   <p>Depending on how many upgrades you, you will have different types of graves
   Platform included for each level (it doesn't break blocks unless needed :p )
   </p>
