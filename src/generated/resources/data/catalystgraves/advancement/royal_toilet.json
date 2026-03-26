@@ -6,7 +6,6 @@
     }
   },
   "display": {
-    "announce_to_chat": false,
     "description": {
       "translate": "advancement.catalystgraves.cheat_death.description"
     },

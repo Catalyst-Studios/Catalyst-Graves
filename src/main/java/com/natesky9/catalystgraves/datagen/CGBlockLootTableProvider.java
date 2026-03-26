@@ -30,6 +30,11 @@ public class CGBlockLootTableProvider extends BlockLootSubProvider
         // dropSelf(ModBlocks.BLOCK.get());
 
         add(CGBlocks.SIMPLE_GRAVE.get(), noDrop());
+
+        dropSelf(CGBlocks.DECORATIVE_GRAVE_0.get());
+        dropSelf(CGBlocks.DECORATIVE_GRAVE_1.get());
+        dropSelf(CGBlocks.DECORATIVE_GRAVE_2.get());
+        dropSelf(CGBlocks.DECORATIVE_GRAVE_3.get());
     }
 
     @Override

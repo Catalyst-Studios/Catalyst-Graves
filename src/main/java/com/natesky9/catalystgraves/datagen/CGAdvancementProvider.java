@@ -24,7 +24,7 @@ public class CGAdvancementProvider implements AdvancementProvider.AdvancementGen
     public static ResourceLocation ORGANIZATION = name("organization");
     public static ResourceLocation CORPOREAL_RECALL = name("corporeal_recall");
     public static ResourceLocation SOULBOUND = name("soulbound_enchanting");
-    public static ResourceLocation WIP = name("wip");
+    public static ResourceLocation ROYAL_TOILET = name("royal_toilet");
 
     static Criterion<ImpossibleTrigger.TriggerInstance> unlock = CriteriaTriggers.IMPOSSIBLE
                                                                      .createCriterion(new ImpossibleTrigger.TriggerInstance());
@@ -64,13 +64,13 @@ public class CGAdvancementProvider implements AdvancementProvider.AdvancementGen
                                                                  .parent(lesser_vitality)
                                                                  .build(GREATER_VITALITY);
     @SuppressWarnings("null")
-    public static final AdvancementHolder wip = Advancement.Builder.advancement()
+    public static final AdvancementHolder royal_toilet = Advancement.Builder.advancement()
                                                     .display(Items.NETHER_STAR, Component.translatable("advancement.catalystgraves.cheat_death"),
                                                              Component.translatable("advancement.catalystgraves.cheat_death.description"), null,
-                                                             AdvancementType.CHALLENGE, true, false, true)
+                                                             AdvancementType.CHALLENGE, true, true, true)
                                                     .addCriterion("secret_feature", unlock)
                                                     .parent(greater_vitality)
-                                                    .build(WIP);
+                                                    .build(ROYAL_TOILET);
     @SuppressWarnings("null")
     public static final AdvancementHolder illumination = Advancement.Builder.advancement()
                                                              .display(Items.LANTERN, Component.translatable("advancement.catalystgraves.illumination"),
@@ -127,7 +127,7 @@ public class CGAdvancementProvider implements AdvancementProvider.AdvancementGen
         consumer.accept(desecrate);
         consumer.accept(recall);
         consumer.accept(soulbound);
-        consumer.accept(wip);
+        consumer.accept(royal_toilet);
     }
     
     @SuppressWarnings("null")

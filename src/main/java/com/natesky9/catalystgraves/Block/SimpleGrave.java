@@ -48,7 +48,7 @@ public class SimpleGrave extends BaseEntityBlock
 {
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty GLOWING = BlockStateProperties.OMINOUS;
-    public static IntegerProperty STYLE = BlockStateProperties.LEVEL;
+    public static IntegerProperty STYLE = IntegerProperty.create("style", 0, 3);
     public static final MapCodec<SimpleGrave> CODEC = simpleCodec(SimpleGrave::new);
 
     VoxelShape SIMPLE = Shapes.or(Block.box(2, 0, 2, 14, 1, 14),
@@ -65,6 +65,17 @@ public class SimpleGrave extends BaseEntityBlock
         Block.box(2.8, 19, 9.5, 13.3, 21, 14.5), // Top ↓
         Block.box(4.7, 20, 9.5, 11.3, 23.5, 14.5));
 
+    VoxelShape ROYALGRAVE = Shapes.or(
+            Block.box(4, 0, 4, 12, 2, 12),
+            Block.box(5, 2, 5, 11, 5, 11),
+            Block.box(4, 5, 5, 12, 9, 14),
+            Block.box(4, 7, 3, 12, 15, 6),
+            Block.box(4, 4.9, 5.0, 12, 7.9, 7.0),
+            Block.box(5, 7, 7, 11, 9.1, 13),
+            Block.box(9.9, 12.3, 5.7, 11.9, 12.5, 6.3),
+            Block.box(4, 9.1, 6, 12, 9.2, 14)
+    );
+
     public SimpleGrave(Properties properties)
     {
         super(properties);
@@ -80,6 +91,7 @@ public class SimpleGrave extends BaseEntityBlock
             case 0 -> SIMPLE;
             case 1 -> BASIC;
             case 2 -> TOMBSTONE;
+            case 3 -> ROYALGRAVE;
             default -> super.getShape(state, level, pos, context);
         };
     }

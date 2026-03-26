@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "catalystgraves:block/grave_2",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "catalystgraves:block/grave_2"
+    },
+    "facing=south": {
+      "model": "catalystgraves:block/grave_2",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "catalystgraves:block/grave_2",
+      "y": 270
+    }
+  }
+}
