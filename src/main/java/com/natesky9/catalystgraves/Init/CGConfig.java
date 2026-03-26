@@ -68,6 +68,10 @@ public class CGConfig
         BUILDER.comment("Number of items to display on the grave")
             .define("itemDisplayCount", 3);
 
+    public static final ModConfigSpec.ConfigValue<Boolean> DISABLE_ROYAL_GRAVE = 
+        BUILDER.comment("Disable royal grave for everyone")
+            .define("disbaleRoyalGrave", false);
+
     public static final ModConfigSpec SPEC = BUILDER.build();
 
     public CGConfig(ModContainer container)

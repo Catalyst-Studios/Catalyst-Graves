@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "L": {
+      "item": "minecraft:torch"
+    },
+    "S": {
+      "item": "minecraft:stone_bricks"
+    },
+    "X": {
+      "item": "minecraft:mossy_cobblestone"
+    }
+  },
+  "pattern": [
+    "LSL",
+    "XXX",
+    "SSS"
+  ],
+  "result": {
+    "count": 1,
+    "id": "catalystgraves:decorative_grave_tombstone"
+  }
+}

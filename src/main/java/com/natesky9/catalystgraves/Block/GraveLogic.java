@@ -77,6 +77,7 @@ public class GraveLogic extends SavedData
      */
     static int getGraveTier(ServerPlayer player)
     {
+        if(RoyalGrave.contains(player)) return 3;
         int graveTier = 0;
         graveTier += AdvancementLogic.hasAdvancement(player, CGAdvancementProvider.ORGANIZATION) ? 1 : 0;
         graveTier += AdvancementLogic.hasAdvancement(player, CGAdvancementProvider.GREATER_VITALITY) ? 1 : 0;

@@ -51,3 +51,10 @@ There are also some commands utilities for server admins and user, you just need
 
 If you have Recall advancement, you can sneak right click on the air to tp to your grave, or using the chat command.
 Or sneak right click on an ender chest to get a chest or 2 with the items.
+
+# Credits
+
+Screens shaders have been picked and modified from here:
+
+- Catalogue shader --> https://godotshaders.com/shader/abstract-3d/
+- Soulbinding --> https://godotshaders.com/shader/warped-fractal-noise/

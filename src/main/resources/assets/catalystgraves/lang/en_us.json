@@ -17,13 +17,17 @@
   "advancement.catalystgraves.corporeal_recall.description": "Teleport to your grave by using the book on a nether portal, or bring your grave to you by using the book on an ender chest",
   "advancement.catalystgraves.soul_binding": "Soul Binding",
   "advancement.catalystgraves.soul_binding.description": "Use the book on an enchanting table to bind items",
-  "advancement.catalystgraves.cheat_death": "???",
-  "advancement.catalystgraves.cheat_death.description": "???",
+  "advancement.catalystgraves.cheat_death": "Royal Grave",
+  "advancement.catalystgraves.cheat_death.description": "Get an special grave after dying. Only some might have it",
 
   "itemGroup.catalystgraves": "Catalyst Graves",
 
   "item.catalystgraves.catalogue": "Grave Catalogue",
   "block.catalystgraves.simple_grave": "Simple Grave",
+  "block.catalystgraves.decorative_grave_simple": "Decorative Simple Grave",
+  "block.catalystgraves.decorative_grave_basic": "Decorative Basic Grave",
+  "block.catalystgraves.decorative_grave_tombstone": "Decorative Tombstone Grave",
+  "block.catalystgraves.decorative_grave_royal": "Decorative Royal Grave",
 
   "string.catalogue.fail": "As you go to scribble in the book, previous writing stops you",
   "string.catalogue.aquisition": "You scribble down musings of death",

@@ -1,16 +1,43 @@
 {
   "variants": {
-    "level=0":
-    {
-      "model": "catalystgraves:block/grave_1"
-    },
-    "level=1":
-    {
-      "model": "catalystgraves:block/grave_2"
-    },
-    "level=2":
-    {
-      "model": "catalystgraves:block/grave_3"
-    }
+    "facing=north,ominous=false,style=0": { "model": "catalystgraves:block/grave_1" },
+    "facing=east,ominous=false,style=0": { "model": "catalystgraves:block/grave_1", "y": 90 },
+    "facing=south,ominous=false,style=0": { "model": "catalystgraves:block/grave_1", "y": 180 },
+    "facing=west,ominous=false,style=0": { "model": "catalystgraves:block/grave_1", "y": 270 },
+
+    "facing=north,ominous=true,style=0": { "model": "catalystgraves:block/grave_1" },
+    "facing=east,ominous=true,style=0": { "model": "catalystgraves:block/grave_1", "y": 90 },
+    "facing=south,ominous=true,style=0": { "model": "catalystgraves:block/grave_1", "y": 180 },
+    "facing=west,ominous=true,style=0": { "model": "catalystgraves:block/grave_1", "y": 270 },
+
+    "facing=north,ominous=false,style=1": { "model": "catalystgraves:block/grave_2" },
+    "facing=east,ominous=false,style=1": { "model": "catalystgraves:block/grave_2", "y": 90 },
+    "facing=south,ominous=false,style=1": { "model": "catalystgraves:block/grave_2", "y": 180 },
+    "facing=west,ominous=false,style=1": { "model": "catalystgraves:block/grave_2", "y": 270 },
+
+    "facing=north,ominous=true,style=1": { "model": "catalystgraves:block/grave_2" },
+    "facing=east,ominous=true,style=1": { "model": "catalystgraves:block/grave_2", "y": 90 },
+    "facing=south,ominous=true,style=1": { "model": "catalystgraves:block/grave_2", "y": 180 },
+    "facing=west,ominous=true,style=1": { "model": "catalystgraves:block/grave_2", "y": 270 },
+
+    "facing=north,ominous=false,style=2": { "model": "catalystgraves:block/grave_3" },
+    "facing=east,ominous=false,style=2": { "model": "catalystgraves:block/grave_3", "y": 90 },
+    "facing=south,ominous=false,style=2": { "model": "catalystgraves:block/grave_3", "y": 180 },
+    "facing=west,ominous=false,style=2": { "model": "catalystgraves:block/grave_3", "y": 270 },
+
+    "facing=north,ominous=true,style=2": { "model": "catalystgraves:block/grave_3" },
+    "facing=east,ominous=true,style=2": { "model": "catalystgraves:block/grave_3", "y": 90 },
+    "facing=south,ominous=true,style=2": { "model": "catalystgraves:block/grave_3", "y": 180 },
+    "facing=west,ominous=true,style=2": { "model": "catalystgraves:block/grave_3", "y": 270 },
+
+    "facing=north,ominous=false,style=3": { "model": "catalystgraves:block/grave_4" },
+    "facing=east,ominous=false,style=3": { "model": "catalystgraves:block/grave_4", "y": 90 },
+    "facing=south,ominous=false,style=3": { "model": "catalystgraves:block/grave_4", "y": 180 },
+    "facing=west,ominous=false,style=3": { "model": "catalystgraves:block/grave_4", "y": 270 },
+
+    "facing=north,ominous=true,style=3": { "model": "catalystgraves:block/grave_4" },
+    "facing=east,ominous=true,style=3": { "model": "catalystgraves:block/grave_4", "y": 90 },
+    "facing=south,ominous=true,style=3": { "model": "catalystgraves:block/grave_4", "y": 180 },
+    "facing=west,ominous=true,style=3": { "model": "catalystgraves:block/grave_4", "y": 270 }
   }
 }

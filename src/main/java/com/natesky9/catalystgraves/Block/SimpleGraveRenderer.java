@@ -20,6 +20,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
+import net.minecraft.world.entity.player.Player;
 
 @SuppressWarnings("null")
 public class SimpleGraveRenderer implements BlockEntityRenderer<SimpleGraveEntity>
@@ -47,7 +48,7 @@ public class SimpleGraveRenderer implements BlockEntityRenderer<SimpleGraveEntit
         {
             Vec3 camera = renderDispatcher.camera.getBlockPosition().getCenter();
             double distance = camera.distanceTo(grave.getBlockPos().getCenter());
-            if(distance > 4)
+            if(distance > 7)
                 renderSpectralCube(poseStack, multiBufferSource, grave);
         }
     }
@@ -69,10 +70,18 @@ public class SimpleGraveRenderer implements BlockEntityRenderer<SimpleGraveEntit
             poseStack.translate(-1f / 16, 0, 0);
             poseStack.translate(0, -5f / 16, -.02);
         }
-        if(state.getValue(SimpleGrave.STYLE) == 2)
+        else if(state.getValue(SimpleGrave.STYLE) == 2)
         {
             poseStack.translate(0, -3 / 16f, 0);
         }
+        else if(state.getValue(SimpleGrave.STYLE) == 3)
+        {
+            poseStack.translate(0, -3 / 16f, 0);
+            poseStack.translate(0.5f, 0f, 0.5f);
+            poseStack.mulPose(Axis.YP.rotationDegrees(180f));
+            poseStack.translate(-0.5f, 0f, -0.5f);
+        }
+
         // the -.03 is needed to have the text above the model
         poseStack.translate(10.7f / 16, 14.5f / 16, 10.3f / 16 - .03);
         poseStack.scale(-width, -width, width);
@@ -85,7 +94,6 @@ public class SimpleGraveRenderer implements BlockEntityRenderer<SimpleGraveEntit
 
     void renderItems(PoseStack poseStack, MultiBufferSource multiBufferSource, int light, int overlay, SimpleGraveEntity grave)
     {
-
         ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
         NonNullList<ItemStack> graveItems = grave.getItems();
         if(graveItems.isEmpty()) return;
@@ -94,7 +102,6 @@ public class SimpleGraveRenderer implements BlockEntityRenderer<SimpleGraveEntit
         poseStack.translate(.4f, 1f / 16, .4f);
         poseStack.scale(1f / 4, 1f / 4, 1f / 4);
         poseStack.mulPose(Axis.XN.rotationDegrees(-90));
-        // TODO:implement the config option here
         ItemStack stack = grave.getItems().getFirst();
         renderer.renderStatic(stack, ItemDisplayContext.FIXED, light, overlay,
                               poseStack, multiBufferSource, grave.getLevel(), 0);
@@ -110,16 +117,23 @@ public class SimpleGraveRenderer implements BlockEntityRenderer<SimpleGraveEntit
 
     void renderSpectralCube(PoseStack poseStack, MultiBufferSource multiBufferSource, SimpleGraveEntity grave)
     {
+        Player player = Minecraft.getInstance().player;
+        
+        if (player == null || grave.getUuid() == null || !player.getUUID().equals(grave.getUuid()))
+        {
+            return;
+        }
+
         VertexConsumer consumer = multiBufferSource.getBuffer(CGRenderTypes.SPECTRAL);
-        //
-        Shapes.block().forAllEdges(
-            (p_323073_, p_323074_, p_323075_, p_323076_, p_323077_, p_323078_) -> {
-                consumer.addVertex(poseStack.last(), (float)(p_323073_), (float)(p_323074_), (float)(p_323075_))
-                    .setColor(255, 0, 255, 255)
-                    .setNormal(poseStack.last(), 0, 0, 0);
-                consumer.addVertex(poseStack.last(), (float)(p_323076_), (float)(p_323077_), (float)(p_323078_))
-                    .setColor(255, 0, 255, 255)
-                    .setNormal(poseStack.last(), 0, 0, 0);
-            });
+        //x1, y1, z1 = Point initial line
+        //x2, y2, z2 = Point final line
+        Shapes.block().forAllEdges((x1, y1, z1, x2, y2, z2) -> {
+            consumer.addVertex(poseStack.last(), (float)x1, (float)y1, (float)z1)
+                .setColor(255, 0, 255, 255)
+                .setNormal(poseStack.last(), 0, 0, 0);
+            consumer.addVertex(poseStack.last(), (float)x2, (float)y2, (float)z2)
+                .setColor(255, 0, 255, 255)
+                .setNormal(poseStack.last(), 0, 0, 0);
+        });
     }
 }

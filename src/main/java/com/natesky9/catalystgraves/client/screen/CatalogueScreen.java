@@ -44,7 +44,6 @@ public class CatalogueScreen extends AbstractContainerScreen<CatalogueMenu> impl
     public Player player;
     ClientAdvancements clientAdvancements;
 
-    
     public CatalogueScreen(CatalogueMenu menu, Inventory playerInventory, Component title)
     {
         super(menu, playerInventory, title);
@@ -78,16 +77,11 @@ public class CatalogueScreen extends AbstractContainerScreen<CatalogueMenu> impl
         return topPos + ((index - 1) / 2) * 32 + 36;
     }
 
-    
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY)
     {
         int x = leftPos;
         int y = topPos;
-
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderTexture(0, FRAME_TEXTURE);
-        guiGraphics.blit(FRAME_TEXTURE, x - 12, y - 17, 0, 0, 280, 200, 280, 200);
 
         ShaderInstance shader = ClientEvents.getStarrySkyShader();
         if(shader != null)
@@ -104,43 +98,42 @@ public class CatalogueScreen extends AbstractContainerScreen<CatalogueMenu> impl
 
             Matrix4f matrix4f = guiGraphics.pose().last().pose();
             Tesselator tesselator = Tesselator.getInstance();
-            BufferBuilder bufferbuilder = tesselator.begin(
-                VertexFormat.Mode.QUADS,
-                DefaultVertexFormat.POSITION_TEX);
+            BufferBuilder bufferbuilder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
 
-            float u1 = 0.0F;
-            float u2 = 1.0F;
-            float v1 = 0.0F;
-            float v2 = 1.0F;
-            int width = 258;
-            int height = 171;
+            int pW = 307;
+            int pH = 273;
+            int pX = x - 25;
+            int pY = y - 53;
 
-            bufferbuilder.addVertex(matrix4f, x, y + height, 0.0F).setUv(u1, v2);
-            bufferbuilder.addVertex(matrix4f, x + width, y + height, 0.0F).setUv(u2, v2);
-            bufferbuilder.addVertex(matrix4f, x + width, y, 0.0F).setUv(u2, v1);
-            bufferbuilder.addVertex(matrix4f, x, y, 0.0F).setUv(u1, v1);
+            bufferbuilder.addVertex(matrix4f, pX, pY + pH, 0.0F).setUv(0.0F, 1.0F);
+            bufferbuilder.addVertex(matrix4f, pX + pW, pY + pH, 0.0F).setUv(1.0F, 1.0F);
+            bufferbuilder.addVertex(matrix4f, pX + pW, pY, 0.0F).setUv(1.0F, 0.0F);
+            bufferbuilder.addVertex(matrix4f, pX, pY, 0.0F).setUv(0.0F, 0.0F);
 
             BufferUploader.drawWithShader(bufferbuilder.buildOrThrow());
         }
         else
         {
-            guiGraphics.blit(PAGES_TEXTURE, x, y, 0, 0, 258, 171, 258, 171);
+            guiGraphics.blit(PAGES_TEXTURE, x - 25, y - 53, 0, 0, 307, 273, 382, 338);
         }
+
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderTexture(0, FRAME_TEXTURE);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        guiGraphics.blit(FRAME_TEXTURE, x - 25, y - 53, 0, 0, 307, 273, 307, 273);
 
         renderExperienceBar(guiGraphics, x, y);
     }
 
-    
     private void renderExperienceBar(GuiGraphics guiGraphics, int x, int y)
     {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         int xpX = x + imageWidth / 2;
-        int xpY = y + imageHeight;
+        int xpY = y + imageHeight - 20;
         guiGraphics.blit(XP_BAR, xpX - 16, xpY - 12, 0, 0, 32, 8, 32, 8);
         guiGraphics.drawCenteredString(font, String.valueOf(player.experienceLevel), xpX, xpY - 12, 0x80FF20);
     }
 
-    
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick)
     {
@@ -148,15 +141,14 @@ public class CatalogueScreen extends AbstractContainerScreen<CatalogueMenu> impl
         this.renderTooltip(guiGraphics, mouseX, mouseY);
     }
 
-    
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY)
     {
-        guiGraphics.drawCenteredString(font, this.title, imageWidth / 2, titleLabelY, 0xFFFFFF);
+        guiGraphics.drawCenteredString(font, this.title, imageWidth / 2, titleLabelY + 10, 0xFFFFFF);
     }
 
     @Override
-    public void onUpdateAdvancementProgress( AdvancementNode node,  AdvancementProgress progress)
+    public void onUpdateAdvancementProgress(AdvancementNode node, AdvancementProgress progress)
     {
         for(Renderable r : renderables)
         {
@@ -169,19 +161,19 @@ public class CatalogueScreen extends AbstractContainerScreen<CatalogueMenu> impl
     }
 
     @Override
-    public void onAddAdvancementRoot( AdvancementNode n)
+    public void onAddAdvancementRoot(AdvancementNode n)
     {
     }
     @Override
-    public void onRemoveAdvancementRoot( AdvancementNode n)
+    public void onRemoveAdvancementRoot(AdvancementNode n)
     {
     }
     @Override
-    public void onAddAdvancementTask( AdvancementNode n)
+    public void onAddAdvancementTask(AdvancementNode n)
     {
     }
     @Override
-    public void onRemoveAdvancementTask( AdvancementNode n)
+    public void onRemoveAdvancementTask(AdvancementNode n)
     {
     }
     @Override
@@ -189,7 +181,7 @@ public class CatalogueScreen extends AbstractContainerScreen<CatalogueMenu> impl
     {
     }
     @Override
-    public void onSelectedTabChanged( @Nullable AdvancementHolder h)
+    public void onSelectedTabChanged(@Nullable AdvancementHolder h)
     {
     }
 }

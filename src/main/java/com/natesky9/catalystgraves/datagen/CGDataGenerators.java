@@ -32,5 +32,6 @@ public class CGDataGenerators
         generator.addProvider(true, new CGItemTagsProvider(packOutput, lookupProvider,
                                                            blockTagsProvider.contentsGetter(), helper));
         event.createProvider(CGEnchantmentTagsProvider::new);
+        generator.addProvider(event.includeServer(), new CGRecipesProvider(packOutput, lookupProvider));
     }
 }

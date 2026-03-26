@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "catalystgraves:decorative_grave_simple"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "catalystgraves:blocks/decorative_grave_simple"
+}
