@@ -48,7 +48,16 @@ import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerWakeUpEvent;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Handles the logic for grave generation, inventory snapshots, 
@@ -58,10 +67,10 @@ import java.util.*;
 public class GraveLogic extends SavedData
 {
     public static GraveLogic instance;
-    static Map<UUID, List<ItemStack>> soulboundItems = new HashMap<>();
-    public static Map<UUID, List<ItemStack>> deathSnapshot = new HashMap<>();
-    public static Map<UUID, List<ItemStack>> curiosSnapshot = new HashMap<>();
-    public static Map<UUID, List<GlobalPos>> activeGraves = new HashMap<>();
+    public static final Map<UUID, List<ItemStack>> soulboundItems = new ConcurrentHashMap<>();
+    public static final Map<UUID, List<ItemStack>> deathSnapshot = new ConcurrentHashMap<>();
+    public static final Map<UUID, List<ItemStack>> curiosSnapshot = new ConcurrentHashMap<>();
+    public static final Map<UUID, List<GlobalPos>> activeGraves = new ConcurrentHashMap<>();
 
     /**
      * Factory method to create a new instance of GraveLogic.
@@ -88,26 +97,26 @@ public class GraveLogic extends SavedData
     public CompoundTag save(CompoundTag compoundTag, HolderLookup.Provider provider)
     {
         // Save the death snapshot list to NBT.
+        ListTag snapshotListTag = new ListTag();
         deathSnapshot.forEach((key, value) -> {
-            ListTag snapshotList = new ListTag();
             CompoundTag snapshotCompound = new CompoundTag();
             snapshotCompound.putUUID("uuid", key);
-            snapshotList.add(snapshotCompound);
             NonNullList<ItemStack> list = NonNullList.copyOf(value);
             ContainerHelper.saveAllItems(snapshotCompound, list, provider);
-            compoundTag.put("Grave Snapshots", snapshotList);
+            snapshotListTag.add(snapshotCompound);
         });
+        compoundTag.put("Grave Snapshots", snapshotListTag);
 
         // Save soulbound items to NBT.
+        ListTag soulboundListTag = new ListTag();
         soulboundItems.forEach((key, value) -> {
-            ListTag soulboundList = new ListTag();
             CompoundTag soulboundCompound = new CompoundTag();
             soulboundCompound.putUUID("uuid", key);
-            soulboundList.add(soulboundCompound);
             NonNullList<ItemStack> list = NonNullList.copyOf(value);
             ContainerHelper.saveAllItems(soulboundCompound, list, provider);
-            compoundTag.put("Soulbounds", soulboundList);
+            soulboundListTag.add(soulboundCompound);
         });
+        compoundTag.put("Soulbounds", soulboundListTag);
 
         // Save active grave locations to NBT.
         ListTag gravesListTag = new ListTag();
@@ -116,14 +125,17 @@ public class GraveLogic extends SavedData
             playerGravesTag.putUUID("uuid", key);
 
             ListTag posList = new ListTag();
-            for(GlobalPos pos : positions)
+            synchronized(positions)
             {
-                CompoundTag posTag = new CompoundTag();
-                posTag.putString("dimension", pos.dimension().location().toString());
-                posTag.putInt("x", pos.pos().getX());
-                posTag.putInt("y", pos.pos().getY());
-                posTag.putInt("z", pos.pos().getZ());
-                posList.add(posTag);
+                for(GlobalPos pos : positions)
+                {
+                    CompoundTag posTag = new CompoundTag();
+                    posTag.putString("dimension", pos.dimension().location().toString());
+                    posTag.putInt("x", pos.pos().getX());
+                    posTag.putInt("y", pos.pos().getY());
+                    posTag.putInt("z", pos.pos().getZ());
+                    posList.add(posTag);
+                }
             }
             playerGravesTag.put("positions", posList);
             gravesListTag.add(playerGravesTag);
@@ -146,13 +158,12 @@ public class GraveLogic extends SavedData
             ListTag graveList = tag.getList("Grave Snapshots", Tag.TAG_COMPOUND);
             for(int i = 0; i < graveList.size(); i++)
             {
-                ListTag listtag = tag.getList("Items", Tag.TAG_COMPOUND);
                 CompoundTag compoundTag = graveList.getCompound(i);
-                NonNullList<ItemStack> nonNullList = NonNullList.withSize(listtag.size(), ItemStack.EMPTY);
+                ListTag listTag = compoundTag.contains("Items", Tag.TAG_LIST) ? compoundTag.getList("Items", Tag.TAG_COMPOUND) : new ListTag();
+                NonNullList<ItemStack> nonNullList = NonNullList.withSize(listTag.size(), ItemStack.EMPTY);
                 ContainerHelper.loadAllItems(compoundTag, nonNullList, lookupProvider);
                 UUID uuid = compoundTag.getUUID("uuid");
-                List<ItemStack> list = nonNullList.stream().toList();
-                deathSnapshot.put(uuid, list);
+                deathSnapshot.put(uuid, List.copyOf(nonNullList));
             }
         }
 
@@ -161,13 +172,12 @@ public class GraveLogic extends SavedData
             ListTag soulboundList = tag.getList("Soulbounds", Tag.TAG_COMPOUND);
             for(int i = 0; i < soulboundList.size(); i++)
             {
-                ListTag listTag = tag.getList("Items", Tag.TAG_COMPOUND);
                 CompoundTag compoundTag = soulboundList.getCompound(i);
+                ListTag listTag = compoundTag.contains("Items", Tag.TAG_LIST) ? compoundTag.getList("Items", Tag.TAG_COMPOUND) : new ListTag();
                 NonNullList<ItemStack> nonNullList = NonNullList.withSize(listTag.size(), ItemStack.EMPTY);
                 ContainerHelper.loadAllItems(compoundTag, nonNullList, lookupProvider);
                 UUID uuid = compoundTag.getUUID("uuid");
-                List<ItemStack> list = nonNullList.stream().toList();
-                soulboundItems.put(uuid, list);
+                soulboundItems.put(uuid, new CopyOnWriteArrayList<>(nonNullList));
             }
         }
 
@@ -180,7 +190,7 @@ public class GraveLogic extends SavedData
                 UUID uuid = playerGravesTag.getUUID("uuid");
                 ListTag posList = playerGravesTag.getList("positions", Tag.TAG_COMPOUND);
 
-                List<GlobalPos> positions = new ArrayList<>();
+                List<GlobalPos> positions = new CopyOnWriteArrayList<>();
                 for(int j = 0; j < posList.size(); j++)
                 {
                     CompoundTag posTag = posList.getCompound(j);
@@ -205,22 +215,19 @@ public class GraveLogic extends SavedData
         UUID uuid = player.getUUID();
         Inventory inventory = player.getInventory();
 
-        // Get a snapshot of the player's items for command purposes.
-        // This also contains soulbound items and Curios as a backup.
-        List<ItemStack> itemStacks = new ArrayList<>();
-
         if(inventory.getContainerSize() == 0)
         {
             return;
         }
 
+        List<ItemStack> itemStacks = new ArrayList<>();
         for(int i = 0; i < inventory.getContainerSize(); i++)
         {
             ItemStack item = inventory.getItem(i);
             itemStacks.add(item.copy());
         }
 
-        deathSnapshot.put(uuid, itemStacks);
+        deathSnapshot.put(uuid, List.copyOf(itemStacks));
 
         if(CuriosCompat.isLoaded())
         {
@@ -233,20 +240,16 @@ public class GraveLogic extends SavedData
                     }
                 });
             });
-            curiosSnapshot.put(uuid, curiosList);
+            curiosSnapshot.put(uuid, List.copyOf(curiosList));
         }
 
-        instance.setDirty();
+        if(instance != null) instance.setDirty();
     }
 
     public static List<ItemStack> getSnapshot(ServerPlayer player)
     {
         List<ItemStack> list = deathSnapshot.get(player.getUUID());
-        if(list == null)
-        {
-            return List.of();
-        }
-        return list;
+        return list == null ? List.of() : list;
     }
 
     /**
@@ -254,8 +257,8 @@ public class GraveLogic extends SavedData
      */
     public static void RestoreContents(Level level, Player player, List<ItemStack> items)
     {
-        List<ItemStack> toFill = new ArrayList<>(List.of());
-        List<ItemStack> chests = new ArrayList<>(List.of());
+        List<ItemStack> toFill = new ArrayList<>();
+        List<ItemStack> chests = new ArrayList<>();
         ItemStack chest = new ItemStack(Items.CHEST);
         for(ItemStack item : items)
         {
@@ -283,9 +286,6 @@ public class GraveLogic extends SavedData
             Containers.dropItemStack(level, player.getX(), player.getY() + 1, player.getZ(), filledChest);
     }
 
-    /**
-     * Handles the placement of the grave block and transferring dropped items into it.
-     */
     /**
      * Handles the placement of the grave block and transferring dropped items into it.
      */
@@ -415,8 +415,8 @@ public class GraveLogic extends SavedData
         // Set the player's death location to this position for future reference.
         player.setLastDeathLocation(Optional.of(GlobalPos.of(level.dimension(), search)));
         GlobalPos gravePos = GlobalPos.of(level.dimension(), search);
-        activeGraves.computeIfAbsent(player.getUUID(), k -> new ArrayList<>()).add(gravePos);
-        instance.setDirty();
+        activeGraves.computeIfAbsent(player.getUUID(), k -> new CopyOnWriteArrayList<>()).add(gravePos);
+        if(instance != null) instance.setDirty();
 
         List<ItemEntity> items = event.getDrops().stream().toList();
         UUID uuid = player.getUUID();
@@ -431,9 +431,10 @@ public class GraveLogic extends SavedData
         }
 
         List<ItemStack> snapshot = new ArrayList<>();
-        if(deathSnapshot.containsKey(uuid))
+        List<ItemStack> currentSnapshot = deathSnapshot.get(uuid);
+        if(currentSnapshot != null)
         {
-            for(ItemStack s : deathSnapshot.get(uuid))
+            for(ItemStack s : currentSnapshot)
             {
                 snapshot.add(s.isEmpty() ? ItemStack.EMPTY : s.copy());
             }
@@ -442,7 +443,8 @@ public class GraveLogic extends SavedData
         for(ItemEntity entity : items)
         {
             ItemStack stack = entity.getItem();
-            boolean soulbound = stack.getEnchantments().keySet().stream().anyMatch(holder -> holder.is(CGEnchantments.SOULBOUND));
+            @SuppressWarnings("deprecation")
+			boolean soulbound = stack.getEnchantments().keySet().stream().anyMatch(holder -> holder.is(CGEnchantments.SOULBOUND));
             boolean nativeSoulbound = CGConfig.NATIVE_SOULBOUNDS.get().contains(stack.getItem().toString());
             
             if(nativeSoulbound || soulbound)
@@ -524,17 +526,11 @@ public class GraveLogic extends SavedData
             event.getDrops().remove(entity);
         }
 
-
-        if(soulboundItems.isEmpty())
-        {
-            soulboundItems.put(uuid, freshItems);
-        }
-        else
-        {
-            List<ItemStack> combined = soulboundItems.get(uuid);
-            combined.addAll(freshItems);
-            soulboundItems.put(uuid, combined);
-        }
+        soulboundItems.compute(uuid, (k, existingList) -> {
+            List<ItemStack> list = existingList != null ? existingList : new CopyOnWriteArrayList<>();
+            list.addAll(freshItems);
+            return list;
+        });
 
         grave.setChanged();
     }
@@ -548,7 +544,7 @@ public class GraveLogic extends SavedData
         if(!(event.getEntity() instanceof ServerPlayer player)) return;
 
         ServerLevel level = player.serverLevel();
-        List<ItemStack> items = soulboundItems.get(player.getUUID());
+        List<ItemStack> items = soulboundItems.remove(player.getUUID());
 
         if(items == null)
         {
@@ -566,7 +562,6 @@ public class GraveLogic extends SavedData
             player.addItem(stack);
             level.playSound(null, player.blockPosition(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS);
         }
-        soulboundItems.remove(player.getUUID());
     }
 
     /**
@@ -674,7 +669,7 @@ public class GraveLogic extends SavedData
             placeSafePlatformBlock(level, nw.above(), getRandomFlower());
 
             // Torches or lanterns.
-            Random rand = new Random();
+            var rand = ThreadLocalRandom.current();
             BlockState lightSource1 = rand.nextBoolean() ? Blocks.TORCH.defaultBlockState() : Blocks.SOUL_LANTERN.defaultBlockState();
             BlockState lightSource2 = rand.nextBoolean() ? Blocks.TORCH.defaultBlockState() : Blocks.SOUL_LANTERN.defaultBlockState();
 
@@ -736,9 +731,10 @@ public class GraveLogic extends SavedData
 
     public static void removeGrave(UUID uuid, GlobalPos pos)
     {
-        if(activeGraves.containsKey(uuid))
+        List<GlobalPos> positions = activeGraves.get(uuid);
+        if(positions != null)
         {
-            activeGraves.get(uuid).remove(pos);
+            positions.remove(pos);
             if(instance != null) instance.setDirty();
         }
     }

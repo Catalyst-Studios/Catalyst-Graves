@@ -24,7 +24,7 @@ public class SimpleGraveEntity extends BlockEntity
     private NonNullList<ItemStack> curiosItems = NonNullList.create();
     private UUID uuid;
     private String name = "Johnny";
-    private Boolean glowing = false;
+    private boolean glowing = false;
     private boolean vitalityClaimed = false;
 
     public SimpleGraveEntity(BlockPos pos, BlockState blockState)
@@ -32,41 +32,53 @@ public class SimpleGraveEntity extends BlockEntity
         super(CGBlockEntities.SIMPLE_GRAVE.get(), pos, blockState);
     }
 
-    public void setUuid(UUID inputUUID, String inputName)
+    public synchronized void setUuid(UUID inputUUID, String inputName)
     {
-        uuid = inputUUID;
-        name = inputName;
+        this.uuid = inputUUID;
+        this.name = inputName;
+        this.setChanged();
     }
 
-    public UUID getUuid()
+    public synchronized UUID getUuid()
     {
         return uuid;
     }
 
-    public String getName()
+    public synchronized String getName()
     {
         return name;
     }
 
-    public boolean isVitalityClaimed()
+    public synchronized boolean isVitalityClaimed()
     {
         return vitalityClaimed;
     }
 
-    public void setVitalityClaimed(boolean claimed)
+    public synchronized void setVitalityClaimed(boolean claimed)
     {
         this.vitalityClaimed = claimed;
         this.setChanged();
     }
 
+    public synchronized boolean isGlowing()
+    {
+        return glowing;
+    }
+
+    public synchronized void setGlowing(boolean glowing)
+    {
+        this.glowing = glowing;
+        this.setChanged();
+    }
+
     @SuppressWarnings("null")
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries)
+    protected synchronized void saveAdditional(CompoundTag tag, HolderLookup.Provider registries)
     {
         super.saveAdditional(tag, registries);
         tag.putInt("count", this.items.size());
         tag.putBoolean("VitalityClaimed", this.vitalityClaimed);
-        if(uuid != null) tag.putString("uuid", uuid.toString());
+        if(uuid != null) tag.putUUID("uuid", uuid);
         if(name != null) tag.putString("name", name);
         tag.putBoolean("glowing", glowing);
         ContainerHelper.saveAllItems(tag, this.items, registries);
@@ -82,60 +94,88 @@ public class SimpleGraveEntity extends BlockEntity
 
     @SuppressWarnings("null")
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries)
+    protected synchronized void loadAdditional(CompoundTag tag, HolderLookup.Provider registries)
     {
         super.loadAdditional(tag, registries);
         this.vitalityClaimed = tag.getBoolean("VitalityClaimed");
         int count = tag.getInt("count");
-        items = NonNullList.create();
+        this.items = NonNullList.create();
 
-        if(tag.contains("uuid"))
-            uuid = UUID.fromString(tag.getString("uuid"));
+        if(tag.hasUUID("uuid"))
+        {
+            this.uuid = tag.getUUID("uuid");
+        }
+        else if(tag.contains("uuid"))
+        {
+            this.uuid = UUID.fromString(tag.getString("uuid"));
+        }
 
         if(tag.contains("name"))
-            name = tag.getString("name");
+            this.name = tag.getString("name");
 
-        glowing = tag.contains("glowing") && tag.getBoolean("glowing");
+        this.glowing = tag.getBoolean("glowing");
 
-        NonNullList<ItemStack> temp = NonNullList.withSize(count, ItemStack.EMPTY);
-        ContainerHelper.loadAllItems(tag, temp, registries);
-        items.addAll(temp);
+        if(count > 0)
+        {
+            NonNullList<ItemStack> temp = NonNullList.withSize(count, ItemStack.EMPTY);
+            ContainerHelper.loadAllItems(tag, temp, registries);
+            this.items.addAll(temp);
+        }
 
+        this.curiosItems = NonNullList.create();
         if(tag.contains("curios_data"))
         {
             CompoundTag curiosTag = tag.getCompound("curios_data");
             int cCount = curiosTag.getInt("curios_count");
-            this.curiosItems = NonNullList.withSize(cCount, ItemStack.EMPTY);
-            ContainerHelper.loadAllItems(curiosTag, curiosItems, registries);
+            if(cCount > 0)
+            {
+                NonNullList<ItemStack> tempCurios = NonNullList.withSize(cCount, ItemStack.EMPTY);
+                ContainerHelper.loadAllItems(curiosTag, tempCurios, registries);
+                this.curiosItems.addAll(tempCurios);
+            }
         }
     }
 
-    public NonNullList<ItemStack> getItems()
+    public synchronized NonNullList<ItemStack> getItems()
     {
         return items;
     }
 
-    public void add(ItemStack stack)
+    public synchronized void add(ItemStack stack)
     {
-        items.add(stack);
+        if(!stack.isEmpty())
+        {
+            items.add(stack);
+            setChanged();
+        }
     }
 
-    public ItemStack remove()
+    public synchronized ItemStack remove()
     {
-        return items.removeFirst();
+        if(items.isEmpty())
+        {
+            return ItemStack.EMPTY;
+        }
+        ItemStack removed = items.removeFirst();
+        setChanged();
+        return removed;
     }
 
-    public NonNullList<ItemStack> getCuriosItems()
+    public synchronized NonNullList<ItemStack> getCuriosItems()
     {
         return curiosItems;
     }
 
-    public void addCurio(ItemStack stack)
+    public synchronized void addCurio(ItemStack stack)
     {
-        this.curiosItems.add(stack);
+        if(!stack.isEmpty())
+        {
+            this.curiosItems.add(stack);
+            setChanged();
+        }
     }
 
-    public void setGraveContents(NonNullList<ItemStack> mainInv, NonNullList<ItemStack> curiosInv)
+    public synchronized void setGraveContents(NonNullList<ItemStack> mainInv, NonNullList<ItemStack> curiosInv)
     {
         this.items = mainInv;
         this.curiosItems = curiosInv;
@@ -143,12 +183,27 @@ public class SimpleGraveEntity extends BlockEntity
     }
 
     @SuppressWarnings("null")
-    public void dropItems()
+    public synchronized void dropItems()
     {
-        SimpleContainer inventory = new SimpleContainer(items.size());
+        if(getLevel() == null || getLevel().isClientSide) return;
+
+        int totalSize = items.size() + curiosItems.size();
+        if(totalSize == 0) return;
+
+        SimpleContainer inventory = new SimpleContainer(totalSize);
         for(ItemStack item : items)
-            inventory.addItem(item);
+        {
+            if(!item.isEmpty()) inventory.addItem(item.copy());
+        }
+        for(ItemStack curio : curiosItems)
+        {
+            if(!curio.isEmpty()) inventory.addItem(curio.copy());
+        }
+
         Containers.dropContents(getLevel(), getBlockPos(), inventory);
+        items.clear();
+        curiosItems.clear();
+        setChanged();
     }
 
     @Nullable

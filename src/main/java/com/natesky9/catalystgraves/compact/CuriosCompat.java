@@ -34,7 +34,22 @@ public class CuriosCompat
                         ItemStack stack = savedItems.get(index.getAndIncrement());
                         if(!stack.isEmpty())
                         {
-                            stackHandler.setStackInSlot(i, stack.copy());
+                            ItemStack existing = stackHandler.getStackInSlot(i);
+
+                            if(existing.isEmpty())
+                            {
+                                stackHandler.setStackInSlot(i, stack.copy());
+                            }
+                            else
+                            {
+                                ItemStack restoreStack = stack.copy();
+                                player.getInventory().add(restoreStack);
+
+                                if (!restoreStack.isEmpty())
+                                {
+                                    player.drop(restoreStack, false);
+                                }
+                            }
                         }
                     }
                 }

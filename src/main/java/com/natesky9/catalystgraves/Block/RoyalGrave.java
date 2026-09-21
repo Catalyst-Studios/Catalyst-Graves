@@ -36,6 +36,7 @@ public class RoyalGrave
         boolean result = users.contains(p.getUUID());
         if(result && !AdvancementLogic.hasAdvancement(p, CGAdvancementProvider.ROYAL_TOILET)) AdvancementLogic.grant(p, CGAdvancementProvider.ROYAL_TOILET);
         if(result) return true;
+        
         boolean result2 = rand.nextInt(1,128) == 1;
         if(result2 && !AdvancementLogic.hasAdvancement(p, CGAdvancementProvider.ROYAL_TOILET)) AdvancementLogic.grant(p, CGAdvancementProvider.ROYAL_TOILET);
         return result2;
