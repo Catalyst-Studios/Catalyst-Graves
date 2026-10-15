@@ -9,6 +9,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
+import net.minecraft.core.NonNullList;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -136,23 +137,21 @@ public class SimpleGrave extends BaseEntityBlock
         if(level.getBlockEntity(pos) instanceof SimpleGraveEntity grave)
         {
             if(testPrivateGrave(grave, serverPlayer))
+            {
                 return InteractionResult.CONSUME;
-
-            takeGraveContents(server, grave, serverPlayer);
-
+            }
+            
             if(!grave.isVitalityClaimed())
             {
                 processVitality(serverPlayer, server);
                 grave.setVitalityClaimed(true);
             }
 
-            // remove the grave if empty
-            if(grave.getItems().isEmpty())
-            {
-                level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-                level.playSound(null, pos, SoundEvents.STONE_BREAK, SoundSource.BLOCKS);
-                server.sendParticles(ParticleTypes.GLOW, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, 16, 0, 0, 0, .5);
-            }
+            takeGraveContents(server, grave, serverPlayer);
+
+            level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+            level.playSound(null, pos, SoundEvents.STONE_BREAK, SoundSource.BLOCKS);
+            server.sendParticles(ParticleTypes.GLOW, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, 16, 0, 0, 0, .5);
         }
         return InteractionResult.CONSUME;
     }
@@ -210,27 +209,24 @@ public class SimpleGrave extends BaseEntityBlock
         }
 
         Inventory playerInv = player.getInventory();
-        int size = Math.min(playerInv.getContainerSize(), grave.getItems().size());
+        int invSize = playerInv.getContainerSize();
+        NonNullList<ItemStack> items = grave.getItems();
 
-        for(int i = 0; i < size; i++)
+        for(int i = 0; i < items.size(); i++)
         {
-            ItemStack stacksInGrave = grave.getItems().get(i);
+            ItemStack stack = items.get(i);
+            if(stack.isEmpty()) continue;
 
-            if(!stacksInGrave.isEmpty())
+            ItemStack copy = stack.copy();
+            if(i < invSize && playerInv.getItem(i).isEmpty())
             {
-                if(playerInv.getItem(i).isEmpty())
-                {
-                    playerInv.setItem(i, stacksInGrave.copy());
-                }
-                else
-                {
-                    if(!playerInv.add(stacksInGrave.copy()))
-                    {
-                        player.drop(stacksInGrave.copy(), true);
-                    }
-                }
-                grave.getItems().set(i, ItemStack.EMPTY);
+                playerInv.setItem(i, copy);
             }
+            else if(!playerInv.add(copy))
+            {
+                player.drop(copy, true);
+            }
+            items.set(i, ItemStack.EMPTY);
         }
 
         grave.setChanged();

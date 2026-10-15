@@ -378,7 +378,11 @@ public class GraveLogic extends SavedData
         generateGravePlatform(level, search, tier);
 
         BlockEntity blockEntity = level.getBlockEntity(search);
-        if(!(blockEntity instanceof SimpleGraveEntity grave)) return;
+        if(!(blockEntity instanceof SimpleGraveEntity grave))
+        {
+            level.removeBlock(search, false);
+            return;
+        }
 
         List<ItemStack> curiosToCheck = new ArrayList<>();
 
