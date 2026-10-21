@@ -1,4 +1,4 @@
-package com.natesky9.catalystgraves.client.tooltip;
+package com.natesky9.catalystgraves.compat.client.tooltip;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;

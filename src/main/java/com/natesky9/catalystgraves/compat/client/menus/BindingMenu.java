@@ -1,6 +1,6 @@
-package com.natesky9.catalystgraves.client.menus;
+package com.natesky9.catalystgraves.compat.client.menus;
 
-import com.natesky9.catalystgraves.Init.CGMenus;
+import com.natesky9.catalystgraves.init.CGMenus;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -46,12 +46,10 @@ public class BindingMenu extends AbstractContainerMenu
 
     void addPlayerInventory(Inventory playerInventory)
     {
-        // something something magic numbers
         for(int i = 0; i < 9; ++i)
         {
             addSlot(new Slot(playerInventory, i, 8 + i * 18, 142));
         }
-        // add the player inventory, only accounting for vanilla size for now
         for(int i = 0; i < 3; ++i)
         {
             for(int l = 0; l < 9; ++l)

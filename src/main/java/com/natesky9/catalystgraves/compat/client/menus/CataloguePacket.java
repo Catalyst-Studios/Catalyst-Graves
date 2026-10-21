@@ -1,4 +1,4 @@
-package com.natesky9.catalystgraves.client.menus;
+package com.natesky9.catalystgraves.compat.client.menus;
 
 import com.natesky9.catalystgraves.CatalystGraves;
 import io.netty.buffer.ByteBuf;

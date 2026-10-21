@@ -1,7 +1,7 @@
 package com.natesky9.catalystgraves.datagen;
 
 import com.natesky9.catalystgraves.CatalystGraves;
-import com.natesky9.catalystgraves.Init.CGEnchantments;
+import com.natesky9.catalystgraves.init.CGEnchantments;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;

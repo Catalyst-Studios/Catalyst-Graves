@@ -1,9 +1,10 @@
-package com.natesky9.catalystgraves.Block;
+package com.natesky9.catalystgraves.block;
 
 import com.natesky9.catalystgraves.AdvancementLogic;
-import com.natesky9.catalystgraves.Init.CGConfig;
-import com.natesky9.catalystgraves.compact.CuriosCompat;
+import com.natesky9.catalystgraves.compat.curios.CuriosCompat;
+import com.natesky9.catalystgraves.init.CGConfig;
 import com.natesky9.catalystgraves.datagen.CGAdvancementProvider;
+import com.natesky9.catalystgraves.server.GraveLogic;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -38,92 +39,62 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.neoforged.fml.ModList;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
 @SuppressWarnings("null")
-public class SimpleGrave extends BaseEntityBlock
+public class GraveBlock extends BaseEntityBlock
 {
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty GLOWING = BlockStateProperties.OMINOUS;
-    public static IntegerProperty STYLE = IntegerProperty.create("style", 0, 3);
-    public static final MapCodec<SimpleGrave> CODEC = simpleCodec(SimpleGrave::new);
+    public static final IntegerProperty STYLE = IntegerProperty.create("style", 0, 3);
+    public static final MapCodec<GraveBlock> CODEC = simpleCodec(GraveBlock::new);
 
-    VoxelShape SIMPLE = Shapes.or(Block.box(2, 0, 2, 14, 1, 14),
-                                  Block.box(4, 0, 10, 14, 8, 12));
-
-    VoxelShape BASIC =
-        Shapes.or(Block.box(1, 0, 10, 15, 12, 14),
-                  Block.box(2, 12, 10, 14, 14, 14),
-                  Block.box(5, 14, 10, 11, 16, 14));
-
-    VoxelShape TOMBSTONE = Shapes.or(
-        Block.box(1, 0, 9, 15, 2.5, 15), // Base
-        Block.box(2, 2, 10, 14, 19, 14), // Body
-        Block.box(2.8, 19, 9.5, 13.3, 21, 14.5), // Top ↓
-        Block.box(4.7, 20, 9.5, 11.3, 23.5, 14.5));
-
-    VoxelShape ROYALGRAVE = Shapes.or(
-            Block.box(4, 0, 4, 12, 2, 12),
-            Block.box(5, 2, 5, 11, 5, 11),
-            Block.box(4, 5, 5, 12, 9, 14),
-            Block.box(4, 7, 3, 12, 15, 6),
-            Block.box(4, 4.9, 5.0, 12, 7.9, 7.0),
-            Block.box(5, 7, 7, 11, 9.1, 13),
-            Block.box(9.9, 12.3, 5.7, 11.9, 12.5, 6.3),
-            Block.box(4, 9.1, 6, 12, 9.2, 14)
-    );
-
-    public SimpleGrave(Properties properties)
+    public GraveBlock(Properties properties)
     {
         super(properties);
-        registerDefaultState(getStateDefinition().any().setValue(FACING, Direction.NORTH).setValue(GLOWING, false).setValue(STYLE, 0));
+        registerDefaultState(getStateDefinition().any()
+            .setValue(FACING, Direction.NORTH)
+            .setValue(GLOWING, false)
+            .setValue(STYLE, 0));
     }
 
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context)
     {
-
-        return switch(state.getValue(STYLE))
-        {
-            case 0 -> SIMPLE;
-            case 1 -> BASIC;
-            case 2 -> TOMBSTONE;
-            case 3 -> ROYALGRAVE;
-            default -> super.getShape(state, level, pos, context);
-        };
+        int style = state.getValue(STYLE);
+        Direction facing = state.getValue(FACING);
+        return GraveStyles.getShape(style, facing);
     }
 
     @Override
     public boolean canEntityDestroy(BlockState state, BlockGetter level, BlockPos pos, Entity entity)
     {
-        // this prevents dangerous entities like
-        // the wither and ender dragon from destroying
         return false;
     }
 
     @Override
     public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid)
     {
-        if(!(level.getBlockEntity(pos) instanceof SimpleGraveEntity grave))
+        if (!(level.getBlockEntity(pos) instanceof GraveBlockEntity grave))
             return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
 
-        // prevent creative players from accidentally breaking a grave,
-        // and only allow them to while crouching + give them
-        // chests with the contents. Otherwise, prevent players from breaking
-        if(player.isCreative())
+        if (player.isCreative())
         {
-            if(player.isCrouching())
+            if (player.isCrouching())
             {
-                GraveLogic.RestoreContents(player.level(), player, grave.getItems());
+                GraveLogic.RestoreContents(player.level(), player, grave.getItems(), GlobalPos.of(level.dimension(), pos));
                 return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
             }
-            else if(level instanceof ServerLevel)
+            else if (level instanceof ServerLevel)
+            {
                 player.sendSystemMessage(Component.translatable("message.catalystgraves.crouch_to_break")
-                                  .withStyle(ChatFormatting.BLUE));
+                                          .withStyle(ChatFormatting.BLUE));
+            }
         }
         return false;
     }
@@ -131,17 +102,17 @@ public class SimpleGrave extends BaseEntityBlock
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult)
     {
-        if(!(player instanceof ServerPlayer serverPlayer)) return InteractionResult.CONSUME;
+        if (!(player instanceof ServerPlayer serverPlayer)) return InteractionResult.CONSUME;
         ServerLevel server = serverPlayer.serverLevel();
 
-        if(level.getBlockEntity(pos) instanceof SimpleGraveEntity grave)
+        if (level.getBlockEntity(pos) instanceof GraveBlockEntity grave)
         {
-            if(testPrivateGrave(grave, serverPlayer))
+            if (testPrivateGrave(grave, serverPlayer))
             {
                 return InteractionResult.CONSUME;
             }
-            
-            if(!grave.isVitalityClaimed())
+
+            if (!grave.isVitalityClaimed())
             {
                 processVitality(serverPlayer, server);
                 grave.setVitalityClaimed(true);
@@ -162,7 +133,7 @@ public class SimpleGrave extends BaseEntityBlock
         boolean hasLesserVitality = AdvancementLogic.hasAdvancement(player, CGAdvancementProvider.LESSER_VITALITY);
 
         player.setAirSupply(player.getMaxAirSupply());
-        if(hasGreaterVitality)
+        if (hasGreaterVitality)
         {
             player.setHealth(player.getMaxHealth());
             player.getFoodData().eat(12, 1.0F);
@@ -173,24 +144,20 @@ public class SimpleGrave extends BaseEntityBlock
             player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 1200, 0));
             player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 400, 0));
         }
-        else if(hasLesserVitality)
+        else if (hasLesserVitality)
         {
             player.setHealth(player.getMaxHealth());
-
             player.getFoodData().eat(6, 0.5F);
-
             player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 1200, 0));
         }
         level.sendParticles(ParticleTypes.HEART, player.getX(), player.getY(), player.getZ(), 8, 0, 0, 0, .5);
         level.playSound(null, player.blockPosition(), SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS);
     }
 
-    boolean testPrivateGrave(SimpleGraveEntity grave, ServerPlayer player)
+    boolean testPrivateGrave(GraveBlockEntity grave, ServerPlayer player)
     {
-        // returns true if the "Private Graves" config is enabled
-        // and the grave is not the player's
         UUID graveUUID = grave.getUuid();
-        if(CGConfig.PRIVATE_GRAVES.get() && !player.getUUID().equals(graveUUID))
+        if (CGConfig.PRIVATE_GRAVES.get() && !player.getUUID().equals(graveUUID))
         {
             player.displayClientMessage(Component.translatable("string.grave.private")
                                             .withStyle(ChatFormatting.LIGHT_PURPLE),
@@ -200,9 +167,22 @@ public class SimpleGrave extends BaseEntityBlock
         return false;
     }
 
-    void takeGraveContents(ServerLevel server, SimpleGraveEntity grave, ServerPlayer player)
+    void takeGraveContents(ServerLevel server, GraveBlockEntity grave, ServerPlayer player)
     {
-        if(CuriosCompat.isLoaded())
+        GlobalPos gravePos = GlobalPos.of(server.dimension(), grave.getBlockPos());
+
+        if (GraveLogic.graveXp.containsKey(gravePos))
+        {
+            int xp = GraveLogic.graveXp.remove(gravePos);
+            if (xp > 0)
+            {
+                player.giveExperiencePoints(xp);
+                server.playSound(null, player.blockPosition(), SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 1.0F, 1.0F);
+            }
+            if (GraveLogic.instance != null) GraveLogic.instance.setDirty();
+        }
+
+        if(ModList.get().isLoaded("curios"))
         {
             CuriosCompat.restoreCurios(player, grave.getCuriosItems());
             grave.getCuriosItems().clear();
@@ -212,17 +192,17 @@ public class SimpleGrave extends BaseEntityBlock
         int invSize = playerInv.getContainerSize();
         NonNullList<ItemStack> items = grave.getItems();
 
-        for(int i = 0; i < items.size(); i++)
+        for (int i = 0; i < items.size(); i++)
         {
             ItemStack stack = items.get(i);
-            if(stack.isEmpty()) continue;
+            if (stack.isEmpty()) continue;
 
             ItemStack copy = stack.copy();
-            if(i < invSize && playerInv.getItem(i).isEmpty())
+            if (i < invSize && playerInv.getItem(i).isEmpty())
             {
                 playerInv.setItem(i, copy);
             }
-            else if(!playerInv.add(copy))
+            else if (!playerInv.add(copy))
             {
                 player.drop(copy, true);
             }
@@ -244,7 +224,7 @@ public class SimpleGrave extends BaseEntityBlock
     @Override
     public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState)
     {
-        return new SimpleGraveEntity(blockPos, blockState);
+        return new GraveBlockEntity(blockPos, blockState);
     }
 
     @Override
@@ -257,8 +237,6 @@ public class SimpleGrave extends BaseEntityBlock
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context)
     {
-        // shouldn't be needed for this block, as the player is never placing it by hand,
-        // but still good practice to keep it in as reference
         return defaultBlockState()
             .setValue(FACING, context.getHorizontalDirection())
             .setValue(GLOWING, false)
@@ -274,12 +252,12 @@ public class SimpleGrave extends BaseEntityBlock
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston)
     {
-        if(!state.is(newState.getBlock()))
+        if (!state.is(newState.getBlock()))
         {
             BlockEntity blockEntity = level.getBlockEntity(pos);
-            if(blockEntity instanceof SimpleGraveEntity grave)
+            if (blockEntity instanceof GraveBlockEntity grave)
             {
-                if(grave.getUuid() != null)
+                if (grave.getUuid() != null)
                 {
                     GraveLogic.removeGrave(grave.getUuid(), GlobalPos.of(level.dimension(), pos));
                 }

@@ -1,4 +1,4 @@
-package com.natesky9.catalystgraves.client.tooltip;
+package com.natesky9.catalystgraves.compat.client.tooltip;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;

@@ -1,12 +1,16 @@
 package com.natesky9.catalystgraves.datagen;
 
 import com.natesky9.catalystgraves.CatalystGraves;
-import com.natesky9.catalystgraves.Init.CGBlocks;
+import com.natesky9.catalystgraves.block.DecorativeGrave;
+import com.natesky9.catalystgraves.init.CGBlocks;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
 import net.neoforged.neoforge.client.model.generators.ModelFile;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.neoforged.neoforge.registries.DeferredBlock;
+
+import java.util.List;
 
 @SuppressWarnings("null")
 public class CGModelProvider extends BlockStateProvider
@@ -19,19 +23,17 @@ public class CGModelProvider extends BlockStateProvider
     @Override
     protected void registerStatesAndModels()
     {
-
-        registerGrave(CGBlocks.DECORATIVE_GRAVE_0.get(), "grave_1");
-        registerGrave(CGBlocks.DECORATIVE_GRAVE_1.get(), "grave_2");
-        registerGrave(CGBlocks.DECORATIVE_GRAVE_2.get(), "grave_3");
-        registerGrave(CGBlocks.DECORATIVE_GRAVE_3.get(), "grave_4");
+        List<DeferredBlock<DecorativeGrave>> graves = CGBlocks.getDecorativeGraves();
+        for (int i = 0; i < graves.size(); i++)
+        {
+            registerGrave(graves.get(i).get(), "grave_" + (i + 1));
+        }
     }
 
     private void registerGrave(Block block, String modelName)
     {
         ModelFile graveModel = models().getExistingFile(modLoc("block/" + modelName));
-
         horizontalBlock(block, graveModel);
-
         simpleBlockItem(block, graveModel);
     }
 }

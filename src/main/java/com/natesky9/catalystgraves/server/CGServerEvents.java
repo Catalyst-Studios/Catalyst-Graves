@@ -1,30 +1,33 @@
-package com.natesky9.catalystgraves.Init;
+package com.natesky9.catalystgraves.server;
 
 import com.natesky9.catalystgraves.AdvancementLogic;
-import com.natesky9.catalystgraves.Block.GraveLogic;
-import com.natesky9.catalystgraves.Block.SimpleGrave;
-import com.natesky9.catalystgraves.Block.SimpleGraveEntity;
-import com.natesky9.catalystgraves.Block.SimpleGraveRenderer;
 import com.natesky9.catalystgraves.CatalystGraves;
-import com.natesky9.catalystgraves.client.menus.BindingPacket;
-import com.natesky9.catalystgraves.client.menus.CataloguePacket;
+import com.natesky9.catalystgraves.block.GraveBlock;
+import com.natesky9.catalystgraves.block.GraveBlockEntity;
+import com.natesky9.catalystgraves.compat.client.menus.BindingPacket;
+import com.natesky9.catalystgraves.compat.client.menus.CataloguePacket;
 import com.natesky9.catalystgraves.datagen.CGAdvancementProvider;
 import com.natesky9.catalystgraves.datagen.CGDataGenerators;
+import com.natesky9.catalystgraves.init.CGConfig;
+import com.natesky9.catalystgraves.init.CGItems;
 
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.common.util.FakePlayer;
+import net.neoforged.neoforge.common.util.TriState;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
@@ -33,7 +36,6 @@ import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerWakeUpEvent;
-import net.neoforged.neoforge.event.entity.player.UseItemOnBlockEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -43,15 +45,10 @@ import net.neoforged.neoforge.server.command.ConfigCommand;
 
 @EventBusSubscriber(modid = CatalystGraves.MODID)
 @SuppressWarnings("null")
-public class CGEvents
+public class CGServerEvents
 {
-    // This class listens for the respective events that fire,
-    // allowing you to intercept events and run your custom logic
-    // each class HAS to be annotated with @SubscribeEvent
-    // and must be `public static void` to work. The name doesn't matter
-    // but the argument must be the Event object as the parameter
     @SubscribeEvent
-    public static void RegisterCommands(RegisterCommandsEvent event)
+    public static void registerCommands(RegisterCommandsEvent event)
     {
         new CGCommands(event.getDispatcher());
         ConfigCommand.register(event.getDispatcher());
@@ -60,9 +57,10 @@ public class CGEvents
     @SubscribeEvent
     public static void serverStarting(ServerStartingEvent event)
     {
-        // create our SavedData handler, which saves snapshots and soulbound items
         DimensionDataStorage storage = event.getServer().overworld().getDataStorage();
         storage.computeIfAbsent(new SavedData.Factory<SavedData>(GraveLogic::create, GraveLogic::load), "graves");
+
+        GraveBackupManager.initialize(event.getServer());
     }
 
     @SubscribeEvent
@@ -72,27 +70,10 @@ public class CGEvents
     }
 
     @SubscribeEvent
-    public static void useItemOn(UseItemOnBlockEvent event)
-    {
-        // this is to cancel a block right click
-        // Player player = event.getPlayer();
-        // ItemStack slot = event.getUseOnContext().getItemInHand();
-        // Level level = event.getUseOnContext().getLevel();
-        // BlockPos pos = event.getUseOnContext().getClickedPos();
-        ////only process our item, when used on a crafting table
-        // if (!slot.is(ModItems.GRAVE_CATALOGUE)) return;
-        // if (!level.getBlockState(pos).is(Blocks.NETHER_PORTAL)) return;
-        // event.cancelWithResult(ItemInteractionResult.SUCCESS);
-        // event.setCancellationResult(ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION);
-    }
-
-    @SubscribeEvent
     public static void registerPackets(RegisterPayloadHandlersEvent event)
     {
-        // packet register for the catalogue
-        // takes in a string for the advancement, and a cost
         final PayloadRegistrar registrar = event.registrar("1");
-        registrar.playToServer( // make sure this doesn't need to be bidirectional
+        registrar.playToServer(
             CataloguePacket.TYPE,
             CataloguePacket.STREAM_CODEC,
             new DirectionalPayloadHandler<>(
@@ -115,9 +96,8 @@ public class CGEvents
     }
 
     @SubscribeEvent
-    public static void LivingDeathEvent(LivingDeathEvent event)
+    public static void onLivingDeath(LivingDeathEvent event)
     {
-        // only process players
         if(!(event.getEntity() instanceof ServerPlayer player)) return;
         GraveLogic.SnapshotInventory(event);
 
@@ -125,18 +105,50 @@ public class CGEvents
         String dim = player.level().dimension().location().toString();
         boolean hasRecall = AdvancementLogic.hasAdvancement(player, CGAdvancementProvider.CORPOREAL_RECALL);
 
-        String tpCommand = "/execute in " + dim + " run tp @s " + pos.getX() + " " + pos.getY() + " " + pos.getZ();
+        Style COLOR_HEADER = Style.EMPTY.withColor(TextColor.fromRgb(0xFF4757)).withBold(true);
+        Style COLOR_LABEL = Style.EMPTY.withColor(TextColor.fromRgb(0xA4B0BE));
+        Style COLOR_COORDS = Style.EMPTY.withColor(TextColor.fromRgb(0x70A1FF));
+        Style COLOR_DIM = Style.EMPTY.withColor(TextColor.fromRgb(0xA29BFE));
 
-        ClickEvent.Action action = hasRecall ? ClickEvent.Action.RUN_COMMAND : ClickEvent.Action.SUGGEST_COMMAND;
-        Component hoverText = hasRecall ? Component.translatable("commands.catalystgraves.find.hover.tp").withStyle(ChatFormatting.GREEN) : Component.translatable("commands.catalystgraves.find.hover.suggest").withStyle(ChatFormatting.RED);
+        Style COLOR_TP_BTN = Style.EMPTY.withColor(TextColor.fromRgb(0x2ED573)).withBold(true).withUnderlined(true);
+        Style COLOR_COPY_BTN = Style.EMPTY.withColor(TextColor.fromRgb(0x1E90FF)).withUnderlined(true);
 
-        Component deathMessage = Component.translatable("chat.catalystgraves.death_notice", pos.getX(), pos.getY(), pos.getZ())
-                                     .withStyle(ChatFormatting.RED)
-                                     .append(Component.literal(" "))
-                                     .append(Component.translatable("chat.catalystgraves.click_to_tp")
-                                                 .withStyle(style -> style.withColor(ChatFormatting.AQUA).withUnderlined(true).withClickEvent(new ClickEvent(action, tpCommand)).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverText))));
+        Style COLOR_HOVER = Style.EMPTY.withColor(TextColor.fromRgb(0xE2E8F0)).withItalic(true);
 
-        player.sendSystemMessage(deathMessage);
+        Component header = Component.literal("\n")
+                               .append(Component.translatable("message.catalystgraves.death.header").withStyle(COLOR_HEADER));
+
+        Component coordsInfo = Component.literal("  Location: ")
+                                   .withStyle(COLOR_LABEL)
+                                   .append(Component.literal(String.format("[%d, %d, %d]", pos.getX(), pos.getY(), pos.getZ())).withStyle(COLOR_COORDS))
+                                   .append(Component.literal(" in ").withStyle(COLOR_LABEL))
+                                   .append(Component.literal(dim).withStyle(COLOR_DIM));
+
+        Component actionComponent;
+        if(hasRecall)
+        {
+            String tpCmd = "/grave tp 0";
+            actionComponent = Component.literal("  ")
+                                  .append(Component.translatable("message.catalystgraves.death.btn_tp")
+                                              .withStyle(COLOR_TP_BTN
+                                                             .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, tpCmd))
+                                                             .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                                                                                            Component.translatable("message.catalystgraves.death.hover_tp").withStyle(COLOR_HOVER)))));
+        }
+        else
+        {
+            String tpSuggest = String.format("/tp @s %d %d %d", pos.getX(), pos.getY(), pos.getZ());
+            actionComponent = Component.literal("  ")
+                                  .append(Component.translatable("message.catalystgraves.death.btn_coords")
+                                              .withStyle(COLOR_COPY_BTN
+                                                             .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, tpSuggest))
+                                                             .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                                                                                            Component.translatable("message.catalystgraves.death.hover_coords").withStyle(COLOR_HOVER)))));
+        }
+
+        player.sendSystemMessage(header);
+        player.sendSystemMessage(coordsInfo);
+        player.sendSystemMessage(actionComponent);
     }
 
     @SubscribeEvent
@@ -149,22 +161,17 @@ public class CGEvents
     @SubscribeEvent
     public static void livingSpawn(PlayerEvent.Clone event)
     {
-        // this is also for copying over the persistent data from the previous player entity
         GraveLogic.LivingRestoreEvent(event);
     }
 
     @SubscribeEvent
     public static void playerSpawn(EntityJoinLevelEvent event)
     {
-        // event to add a book to new players,
-        // if the config option is enabled
         if(!(event.getEntity() instanceof ServerPlayer player)) return;
 
         boolean loaded = event.loadedFromDisk();
         if(!loaded && CGConfig.SPAWN_WITH_BOOK.get())
         {
-            // until I find the correct event that fires only on first join, this will just always spawn the player
-            // with a book in their inventory, unless they have one
             if(!player.getInventory().hasAnyMatching(item -> item.is(CGItems.GRAVE_CATALOGUE.asItem())))
                 player.addItem(CGItems.GRAVE_CATALOGUE.toStack());
         }
@@ -178,19 +185,13 @@ public class CGEvents
         }
     }
 
-    @SubscribeEvent
-    public static void registerBER(EntityRenderersEvent.RegisterRenderers event)
-    {
-        event.registerBlockEntityRenderer(CGBlockEntities.SIMPLE_GRAVE.get(), SimpleGraveRenderer::new);
-    }
-
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
     public static void onBlockInteract(PlayerInteractEvent.RightClickBlock event)
     {
         Level level = event.getLevel();
         BlockPos pos = event.getPos();
 
-        if(level.getBlockEntity(pos) instanceof SimpleGraveEntity)
+        if(level.getBlockEntity(pos) instanceof GraveBlockEntity grave)
         {
             if(event.getEntity() instanceof FakePlayer)
             {
@@ -203,6 +204,20 @@ public class CGEvents
             if(itemName.contains("wrench") || itemName.contains("configurator") || itemName.contains("hammer"))
             {
                 event.setCanceled(true);
+                return;
+            }
+
+            Player player = event.getEntity();
+            boolean isOwner = grave.getUuid() != null && grave.getUuid().equals(player.getUUID());
+            boolean isAuthorized = isOwner || player.isCreative() || player.hasPermissions(2);
+
+            if(isAuthorized)
+            {
+                if(event.isCanceled())
+                {
+                    event.setCanceled(false);
+                }
+                event.setUseBlock(TriState.TRUE);
             }
         }
     }
@@ -210,7 +225,7 @@ public class CGEvents
     @SubscribeEvent
     public static void onBlockBreak(BlockEvent.BreakEvent event)
     {
-        if(event.getState().getBlock() instanceof SimpleGrave)
+        if(event.getState().getBlock() instanceof GraveBlock)
         {
             if(!(event.getPlayer() instanceof ServerPlayer) || !event.getPlayer().isCreative())
             {

@@ -1,10 +1,11 @@
-package com.natesky9.catalystgraves.Block;
+package com.natesky9.catalystgraves.block;
 
-import com.natesky9.catalystgraves.Init.CGBlocks;
-import com.natesky9.catalystgraves.Init.CGConfig;
-import com.mojang.blaze3d.vertex.*;
+import com.natesky9.catalystgraves.compat.client.CGClientConfig;
+import com.natesky9.catalystgraves.compat.client.CGRenderTypes;
+import com.natesky9.catalystgraves.init.CGBlocks;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import com.natesky9.catalystgraves.Init.CGRenderTypes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -12,7 +13,9 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
@@ -20,31 +23,30 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
-import net.minecraft.world.entity.player.Player;
 
 @SuppressWarnings("null")
-public class SimpleGraveRenderer implements BlockEntityRenderer<SimpleGraveEntity>
+public class GraveBlockRenderer implements BlockEntityRenderer<GraveBlockEntity>
 {
     protected final BlockEntityRenderDispatcher renderDispatcher;
 
-    public SimpleGraveRenderer(BlockEntityRendererProvider.Context context)
+    public GraveBlockRenderer(BlockEntityRendererProvider.Context context)
     {
         renderDispatcher = context.getBlockEntityRenderDispatcher();
     }
 
     @Override
-    public void render(SimpleGraveEntity grave, float v, @NotNull PoseStack poseStack, @NotNull MultiBufferSource multiBufferSource, int light, int overlay)
+    public void render(GraveBlockEntity grave, float v, @NotNull PoseStack poseStack, @NotNull MultiBufferSource multiBufferSource, int light, int overlay)
     {
         if(grave.getLevel() == null) return;
         BlockState state = grave.getLevel().getBlockState(grave.getBlockPos());
         if(!state.is(CGBlocks.SIMPLE_GRAVE)) return;
 
         renderName(poseStack, multiBufferSource, light, grave);
-        //
-        if(CGConfig.DISPLAYED_ITEMS.get() > 0)
+
+        if(CGClientConfig.DISPLAYED_ITEMS.get() > 0)
             renderItems(poseStack, multiBufferSource, light, overlay, grave);
 
-        if(state.getValue(SimpleGrave.GLOWING))
+        if(state.getValue(GraveBlock.GLOWING))
         {
             Vec3 camera = renderDispatcher.camera.getBlockPosition().getCenter();
             double distance = camera.distanceTo(grave.getBlockPos().getCenter());
@@ -53,7 +55,7 @@ public class SimpleGraveRenderer implements BlockEntityRenderer<SimpleGraveEntit
         }
     }
 
-    void renderName(PoseStack poseStack, MultiBufferSource multiBufferSource, int light, SimpleGraveEntity grave)
+    void renderName(PoseStack poseStack, MultiBufferSource multiBufferSource, int light, GraveBlockEntity grave)
     {
         poseStack.pushPose();
 
@@ -63,18 +65,25 @@ public class SimpleGraveRenderer implements BlockEntityRenderer<SimpleGraveEntit
         Font font = Minecraft.getInstance().font;
         int color = 0;
         float width = .4f / font.width(name);
-        // case for the tier 0 grave, to rotate the text
-        if(state.getValue(SimpleGrave.STYLE) == 0)
+
+        int style = state.getValue(GraveBlock.STYLE);
+
+        Direction facing = state.getValue(GraveBlock.FACING);
+        poseStack.translate(0.5, 0, 0.5);
+        poseStack.mulPose(Axis.YP.rotationDegrees(-facing.toYRot() + 180f));
+        poseStack.translate(-0.5, 0, -0.5);
+
+        if(style == 0)
         {
             poseStack.mulPose(new Quaternionf(0, 0, -.22, 1));
             poseStack.translate(-1f / 16, 0, 0);
             poseStack.translate(0, -5f / 16, -.02);
         }
-        else if(state.getValue(SimpleGrave.STYLE) == 2)
+        else if(style == 2)
         {
             poseStack.translate(0, -3 / 16f, 0);
         }
-        else if(state.getValue(SimpleGrave.STYLE) == 3)
+        else if(style == 3)
         {
             poseStack.translate(0, -3 / 16f, 0);
             poseStack.translate(0.5f, 0f, 0.5f);
@@ -82,7 +91,6 @@ public class SimpleGraveRenderer implements BlockEntityRenderer<SimpleGraveEntit
             poseStack.translate(-0.5f, 0f, -0.5f);
         }
 
-        // the -.03 is needed to have the text above the model
         poseStack.translate(10.7f / 16, 14.5f / 16, 10.3f / 16 - .03);
         poseStack.scale(-width, -width, width);
 
@@ -92,7 +100,7 @@ public class SimpleGraveRenderer implements BlockEntityRenderer<SimpleGraveEntit
         poseStack.popPose();
     }
 
-    void renderItems(PoseStack poseStack, MultiBufferSource multiBufferSource, int light, int overlay, SimpleGraveEntity grave)
+    void renderItems(PoseStack poseStack, MultiBufferSource multiBufferSource, int light, int overlay, GraveBlockEntity grave)
     {
         ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
         NonNullList<ItemStack> graveItems = grave.getItems();
@@ -115,18 +123,16 @@ public class SimpleGraveRenderer implements BlockEntityRenderer<SimpleGraveEntit
         poseStack.popPose();
     }
 
-    void renderSpectralCube(PoseStack poseStack, MultiBufferSource multiBufferSource, SimpleGraveEntity grave)
+    void renderSpectralCube(PoseStack poseStack, MultiBufferSource multiBufferSource, GraveBlockEntity grave)
     {
         Player player = Minecraft.getInstance().player;
-        
+
         if (player == null || grave.getUuid() == null || !player.getUUID().equals(grave.getUuid()))
         {
             return;
         }
 
         VertexConsumer consumer = multiBufferSource.getBuffer(CGRenderTypes.SPECTRAL);
-        //x1, y1, z1 = Point initial line
-        //x2, y2, z2 = Point final line
         Shapes.block().forAllEdges((x1, y1, z1, x2, y2, z2) -> {
             consumer.addVertex(poseStack.last(), (float)x1, (float)y1, (float)z1)
                 .setColor(255, 0, 255, 255)

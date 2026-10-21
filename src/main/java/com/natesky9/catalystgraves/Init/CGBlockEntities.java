@@ -1,6 +1,6 @@
-package com.natesky9.catalystgraves.Init;
+package com.natesky9.catalystgraves.init;
 
-import com.natesky9.catalystgraves.Block.SimpleGraveEntity;
+import com.natesky9.catalystgraves.block.GraveBlockEntity;
 import com.natesky9.catalystgraves.CatalystGraves;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -13,11 +13,11 @@ public class CGBlockEntities
 {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
         DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, CatalystGraves.MODID);
-    //
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<SimpleGraveEntity>> SIMPLE_GRAVE =
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<GraveBlockEntity>> SIMPLE_GRAVE =
         BLOCK_ENTITIES.register("simple_grave",
-                                () -> BlockEntityType.Builder.of(SimpleGraveEntity::new, CGBlocks.SIMPLE_GRAVE.get()).build(null));
-    //
+                                () -> BlockEntityType.Builder.of(GraveBlockEntity::new, CGBlocks.SIMPLE_GRAVE.get()).build(null));
+
     public static void register(IEventBus eventBus)
     {
         BLOCK_ENTITIES.register(eventBus);

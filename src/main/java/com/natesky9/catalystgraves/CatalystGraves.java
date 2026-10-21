@@ -1,6 +1,6 @@
 package com.natesky9.catalystgraves;
 
-import com.natesky9.catalystgraves.Init.*;
+import com.natesky9.catalystgraves.init.*;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -10,6 +10,7 @@ import net.neoforged.fml.config.ModConfig.Type;
 public class CatalystGraves
 {
     public static final String MODID = "catalystgraves";
+
     public CatalystGraves(IEventBus modEventBus, ModContainer modContainer)
     {
         CGBlocks.register(modEventBus);

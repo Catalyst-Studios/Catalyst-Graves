@@ -1,10 +1,10 @@
-package com.natesky9.catalystgraves.client.screen;
+package com.natesky9.catalystgraves.compat.client.screen;
 
 import com.natesky9.catalystgraves.CatalystGraves;
-import com.natesky9.catalystgraves.Init.CGConfig;
-import com.natesky9.catalystgraves.client.menus.CatalogueButton;
-import com.natesky9.catalystgraves.client.menus.CatalogueMenu;
-import com.natesky9.catalystgraves.client.shaders.ClientEvents;
+import com.natesky9.catalystgraves.compat.client.CGClientEvents;
+import com.natesky9.catalystgraves.compat.client.menus.CatalogueButton;
+import com.natesky9.catalystgraves.compat.client.menus.CatalogueMenu;
+import com.natesky9.catalystgraves.init.CGConfig;
 import com.natesky9.catalystgraves.datagen.CGAdvancementProvider;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
@@ -65,13 +65,14 @@ public class CatalogueScreen extends AbstractContainerScreen<CatalogueMenu> impl
         addRenderableWidget(new CatalogueButton(this, getX(5), getY(5), CGAdvancementProvider.ILLUMINATION)).setCost(CGConfig.ILLUMINATION_COST.get());
         addRenderableWidget(new CatalogueButton(this, getX(6), getY(6), CGAdvancementProvider.CORPOREAL_RECALL)).setCost(CGConfig.CORPOREAL_RECALL.get());
 
-        clientAdvancements.setListener(this);
+        this.clientAdvancements.setListener(this);
     }
 
     private int getX(int index)
     {
         return leftPos + ((index - 1) % 2) * 124 + 16;
     }
+
     private int getY(int index)
     {
         return topPos + ((index - 1) / 2) * 32 + 36;
@@ -83,12 +84,12 @@ public class CatalogueScreen extends AbstractContainerScreen<CatalogueMenu> impl
         int x = leftPos;
         int y = topPos;
 
-        ShaderInstance shader = ClientEvents.getStarrySkyShader();
-        if(shader != null)
+        ShaderInstance shader = CGClientEvents.getStarrySkyShader();
+        if (shader != null)
         {
-            if(shader.getUniform("Time") != null)
+            if (shader.getUniform("Time") != null)
             {
-                float totalTime = (Minecraft.getInstance().level.getGameTime() + partialTick) / 20.0F;
+                float totalTime = (minecraft.level.getGameTime() + partialTick) / 20.0F;
                 shader.getUniform("Time").set(totalTime);
             }
 
@@ -135,53 +136,46 @@ public class CatalogueScreen extends AbstractContainerScreen<CatalogueMenu> impl
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick)
-    {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
-        this.renderTooltip(guiGraphics, mouseX, mouseY);
-    }
-
-    @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY)
     {
         guiGraphics.drawCenteredString(font, this.title, imageWidth / 2, titleLabelY + 10, 0xFFFFFF);
     }
 
     @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick)
+    {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        renderTooltip(guiGraphics, mouseX, mouseY);
+    }
+
+    @Override
     public void onUpdateAdvancementProgress(AdvancementNode node, AdvancementProgress progress)
     {
-        for(Renderable r : renderables)
+        for (Renderable r : renderables)
         {
-            if(r instanceof CatalogueButton b)
+            if (r instanceof CatalogueButton b)
             {
-                if(b.getCost() == 0) b.active = false;
-                if(node.holder().id().equals(b.advancement)) b.active = !progress.isDone();
+                if (b.getCost() == 0) b.active = false;
+                if (node.holder().id().equals(b.advancement)) b.active = !progress.isDone();
             }
         }
     }
 
     @Override
-    public void onAddAdvancementRoot(AdvancementNode n)
-    {
-    }
+    public void onSelectedTabChanged(@Nullable AdvancementHolder advancementHolder) {}
+
     @Override
-    public void onRemoveAdvancementRoot(AdvancementNode n)
-    {
-    }
+    public void onAdvancementsCleared() {}
+
     @Override
-    public void onAddAdvancementTask(AdvancementNode n)
-    {
-    }
+    public void onAddAdvancementTask(AdvancementNode advancementNode) {}
+
     @Override
-    public void onRemoveAdvancementTask(AdvancementNode n)
-    {
-    }
+    public void onRemoveAdvancementTask(AdvancementNode advancementNode) {}
+
     @Override
-    public void onAdvancementsCleared()
-    {
-    }
+    public void onAddAdvancementRoot(AdvancementNode advancement) {}
+
     @Override
-    public void onSelectedTabChanged(@Nullable AdvancementHolder h)
-    {
-    }
+    public void onRemoveAdvancementRoot(AdvancementNode advancement) {}
 }

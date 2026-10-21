@@ -1,6 +1,6 @@
 package com.natesky9.catalystgraves.datagen;
 
-import com.natesky9.catalystgraves.Init.CGBlocks;
+import com.natesky9.catalystgraves.init.CGBlocks;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;

@@ -1,7 +1,7 @@
 package com.natesky9.catalystgraves.datagen;
 
 import com.natesky9.catalystgraves.CatalystGraves;
-import com.natesky9.catalystgraves.Init.CGEnchantments;
+import com.natesky9.catalystgraves.init.CGEnchantments;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
@@ -16,7 +16,6 @@ public class CGDatapackProvider
 {
     public static DatapackBuiltinEntriesProvider Make(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider)
     {
-
         final RegistrySetBuilder builder = new RegistrySetBuilder();
         builder.add(Registries.ENCHANTMENT, CGEnchantments::bootstrap);
         return new DatapackBuiltinEntriesProvider(packOutput, lookupProvider, builder, Set.of(CatalystGraves.MODID));

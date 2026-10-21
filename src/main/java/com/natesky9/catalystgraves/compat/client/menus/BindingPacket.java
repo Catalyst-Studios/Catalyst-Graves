@@ -1,9 +1,8 @@
-package com.natesky9.catalystgraves.client.menus;
+package com.natesky9.catalystgraves.compat.client.menus;
 
 import com.natesky9.catalystgraves.CatalystGraves;
-import com.natesky9.catalystgraves.Init.CGConfig;
-import com.natesky9.catalystgraves.Init.CGEnchantments;
-import com.natesky9.catalystgraves.datagen.CGItemTagsProvider;
+import com.natesky9.catalystgraves.init.CGConfig;
+import com.natesky9.catalystgraves.init.CGEnchantments;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -42,48 +41,40 @@ public record BindingPacket(int slot) implements CustomPacketPayload
     {
         public static void handleData(final BindingPacket packet, final IPayloadContext context)
         {
-            /*System.out.println("client payload");*/
-            // we also shouldn't need this, since it's a serverbound packet
         }
     }
-    
+
     public static class ServerPayloadHandler
     {
         public static void handleData(final BindingPacket packet, final IPayloadContext context)
         {
-            /*System.out.println("received slot: " + packet.slot);*/
-            ServerPlayer player = (ServerPlayer)context.player();
+            ServerPlayer player = (ServerPlayer) context.player();
             ServerLevel serverLevel = player.serverLevel();
             int slot = packet.slot;
             ItemStack stack = player.getInventory().getItem(slot);
 
-            int xpLevel = player.experienceLevel;
-            // validate player level
-            if(xpLevel < CGConfig.SOULBOUND_COST.get())
+            int cost = CGConfig.SOULBOUND_COST.get();
+            if (player.experienceLevel < cost)
             {
-                /*System.out.println("Player doesn't have the levels to enchant!");*/
                 serverLevel.playSound(null, player.blockPosition(), SoundEvents.GRINDSTONE_USE, SoundSource.PLAYERS);
                 return;
             }
-            // validate itemstack has the tag
-            if(!stack.is(CGItemTagsProvider.SOULBOUND_APPLICABLE))
+
+            if (stack.isEmpty() || com.natesky9.catalystgraves.server.GraveLogic.isBlacklistedFromSoulbound(stack))
             {
-                /*System.out.println("Item doesn't have the tag " + CGItemTagsProvider.SOULBOUND_APPLICABLE);*/
                 serverLevel.playSound(null, player.blockPosition(), SoundEvents.DISPENSER_FAIL, SoundSource.PLAYERS);
                 return;
             }
+
             Registry<Enchantment> enchantmentRegistry = player.level().registryAccess().registryOrThrow(Registries.ENCHANTMENT);
             Holder<Enchantment> enchantmentHolder = enchantmentRegistry.getHolderOrThrow(CGEnchantments.SOULBOUND);
-            // validate it doesn't already have the enchantment
-            if(stack.getEnchantmentLevel(enchantmentHolder) > 0)
+            if (stack.getEnchantmentLevel(enchantmentHolder) > 0)
             {
                 serverLevel.playSound(null, player.blockPosition(), SoundEvents.DISPENSER_FAIL, SoundSource.PLAYERS);
-                /*System.out.println("Item already has the enchantment!");*/
-
                 return;
             }
-            // all checks passed, now to enchant it
 
+            player.giveExperienceLevels(-cost);
             stack.enchant(enchantmentHolder, 1);
             serverLevel.playSound(null, player.blockPosition(), SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.PLAYERS);
             serverLevel.playSound(null, player.blockPosition(), SoundEvents.SOUL_ESCAPE.value(), SoundSource.PLAYERS);

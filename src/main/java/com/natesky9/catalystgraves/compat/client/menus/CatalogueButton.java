@@ -1,9 +1,9 @@
-package com.natesky9.catalystgraves.client.menus;
+package com.natesky9.catalystgraves.compat.client.menus;
 
 import com.mojang.blaze3d.Blaze3D;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.natesky9.catalystgraves.CatalystGraves;
-import com.natesky9.catalystgraves.client.screen.CatalogueScreen;
+import com.natesky9.catalystgraves.compat.client.screen.CatalogueScreen;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;

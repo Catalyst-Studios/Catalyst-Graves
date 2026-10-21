@@ -1,6 +1,6 @@
-package com.natesky9.catalystgraves.Block;
+package com.natesky9.catalystgraves.block;
 
-import com.natesky9.catalystgraves.Init.CGBlockEntities;
+import com.natesky9.catalystgraves.init.CGBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public class SimpleGraveEntity extends BlockEntity
+public class GraveBlockEntity extends BlockEntity
 {
     private NonNullList<ItemStack> items = NonNullList.create();
     private NonNullList<ItemStack> curiosItems = NonNullList.create();
@@ -27,7 +27,7 @@ public class SimpleGraveEntity extends BlockEntity
     private boolean glowing = false;
     private boolean vitalityClaimed = false;
 
-    public SimpleGraveEntity(BlockPos pos, BlockState blockState)
+    public GraveBlockEntity(BlockPos pos, BlockState blockState)
     {
         super(CGBlockEntities.SIMPLE_GRAVE.get(), pos, blockState);
     }
@@ -210,7 +210,6 @@ public class SimpleGraveEntity extends BlockEntity
     @Override
     public Packet<ClientGamePacketListener> getUpdatePacket()
     {
-        // we need this and #getUpdateTag to send blockentity data to the client
         return ClientboundBlockEntityDataPacket.create(this);
     }
 

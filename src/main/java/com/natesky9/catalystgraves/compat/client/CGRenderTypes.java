@@ -1,4 +1,4 @@
-package com.natesky9.catalystgraves.Init;
+package com.natesky9.catalystgraves.compat.client;
 
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;

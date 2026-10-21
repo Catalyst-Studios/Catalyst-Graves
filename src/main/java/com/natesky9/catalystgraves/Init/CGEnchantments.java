@@ -1,4 +1,4 @@
-package com.natesky9.catalystgraves.Init;
+package com.natesky9.catalystgraves.init;
 
 import com.natesky9.catalystgraves.CatalystGraves;
 import com.natesky9.catalystgraves.datagen.CGEnchantmentTagsProvider;
@@ -18,10 +18,9 @@ public class CGEnchantments
 {
     public static final ResourceKey<Enchantment> SOULBOUND = ResourceKey.create(Registries.ENCHANTMENT,
                                                                                 ResourceLocation.fromNamespaceAndPath(CatalystGraves.MODID, "soulbound"));
-    //
+
     public static void bootstrap(BootstrapContext<Enchantment> context)
     {
-        // the soulbound enchantment
         HolderGetter<Item> holderItem = context.lookup(Registries.ITEM);
         HolderGetter<Enchantment> holderEnchantment = context.lookup(Registries.ENCHANTMENT);
         context.register(SOULBOUND,

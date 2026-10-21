@@ -1,11 +1,12 @@
-package com.natesky9.catalystgraves.Item;
+package com.natesky9.catalystgraves.item;
 
-import com.natesky9.catalystgraves.Block.GraveLogic;
-import com.natesky9.catalystgraves.Block.SimpleGraveEntity;
-import com.natesky9.catalystgraves.Init.CGBlocks;
-import com.natesky9.catalystgraves.client.menus.CatalogueMenu;
-import com.natesky9.catalystgraves.client.tooltip.CatalogueTooltipData;
+import com.natesky9.catalystgraves.AdvancementLogic;
+import com.natesky9.catalystgraves.block.GraveBlockEntity;
+import com.natesky9.catalystgraves.compat.client.menus.CatalogueMenu;
+import com.natesky9.catalystgraves.compat.client.tooltip.CatalogueTooltipData;
 import com.natesky9.catalystgraves.datagen.CGAdvancementProvider;
+import com.natesky9.catalystgraves.init.CGBlocks;
+import com.natesky9.catalystgraves.server.GraveLogic;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.AdvancementHolder;
@@ -13,12 +14,13 @@ import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.ServerAdvancementManager;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -34,25 +36,24 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Main item for the Catalyst Graves mod.
- * Handles grave teleportation, remote recovery via Ender Chests,
- * and provides access to the Soulbinding interface.
- */
+@SuppressWarnings("null")
 public class GraveCatalogue extends Item implements MenuProvider
 {
     private static float shiftProgress = 0.0f;
     private static long lastTime = System.currentTimeMillis();
-    private BindingChapter bindingMenu = new BindingChapter();
+    private final BindingChapter bindingMenu = new BindingChapter();
 
     public GraveCatalogue(Properties properties)
     {
@@ -65,11 +66,9 @@ public class GraveCatalogue extends Item implements MenuProvider
         return Component.translatable("menu.catalogue");
     }
 
-    @SuppressWarnings("null")
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag)
     {
-        // Show "Press SHIFT" prompt when not crouching
         if(!Screen.hasShiftDown())
         {
             tooltipComponents.add(
@@ -82,12 +81,10 @@ public class GraveCatalogue extends Item implements MenuProvider
     }
 
     @Override
-    public Optional<TooltipComponent> getTooltipImage(@SuppressWarnings("null") ItemStack stack)
+    public Optional<TooltipComponent> getTooltipImage(ItemStack stack)
     {
-        // Provide detailed info data when SHIFT is held
         if(Screen.hasShiftDown())
         {
-            @SuppressWarnings("null")
             Component infoText = Component.translatable("tooltip.catalystgraves.catalogue.info")
                                      .withStyle(Style.EMPTY.withColor(TextColor.fromRgb(0xF74611)));
             return Optional.of(new CatalogueTooltipData(infoText));
@@ -95,7 +92,6 @@ public class GraveCatalogue extends Item implements MenuProvider
         return Optional.empty();
     }
 
-    @SuppressWarnings("null")
     @Override
     public Component getName(ItemStack stack)
     {
@@ -105,7 +101,6 @@ public class GraveCatalogue extends Item implements MenuProvider
 
         if(deltaTime > 0.1f) deltaTime = 0.1f;
 
-        // Transition logic: Shift increases progress, releasing decreases it
         if(Screen.hasShiftDown())
         {
             shiftProgress += deltaTime * 0.75f;
@@ -117,20 +112,16 @@ public class GraveCatalogue extends Item implements MenuProvider
             if(shiftProgress < 0.0f) shiftProgress = 0.0f;
         }
 
-        // Constant pulse wave for color animation
         double wave = (Math.sin(currentTime / 250.0) + 1.0) / 2.0;
 
-        // Normal State: Red to Orange
         int r1 = 255;
         int g1 = (int)(wave * 128);
         int b1 = 0;
 
-        // Shift State: Dark Blue to Cyan
         int r2 = 0;
         int g2 = (int)(wave * 255);
         int b2 = 170 + (int)(wave * 85);
 
-        // Color interpolation based on shift progress
         int finalR = (int)(r1 + (r2 - r1) * shiftProgress);
         int finalG = (int)(g1 + (g2 - g1) * shiftProgress);
         int finalB = (int)(b1 + (b2 - b1) * shiftProgress);
@@ -141,7 +132,6 @@ public class GraveCatalogue extends Item implements MenuProvider
             .withStyle(Style.EMPTY.withColor(hexColor));
     }
 
-    @SuppressWarnings("null")
     InteractionResult failsOnLocateGrave(Player player)
     {
         player.sendSystemMessage(Component.translatable("string.grave.fail.nondeath"));
@@ -152,7 +142,6 @@ public class GraveCatalogue extends Item implements MenuProvider
         return InteractionResult.CONSUME;
     }
 
-    @SuppressWarnings("null")
     InteractionResult openSoulbindMenu(Player player, ServerLevel level, BlockPos pos)
     {
         player.openMenu(bindingMenu);
@@ -160,14 +149,12 @@ public class GraveCatalogue extends Item implements MenuProvider
         return InteractionResult.CONSUME;
     }
 
-    @SuppressWarnings("null")
     @Override
     public AbstractContainerMenu createMenu(int i, Inventory inventory, Player player)
     {
         return new CatalogueMenu(i, inventory);
     }
 
-    @SuppressWarnings("null")
     InteractionResult graveFailLevelNull(Player player)
     {
         player.sendSystemMessage(Component.translatable("string.grave.fail.levelnull"));
@@ -178,11 +165,15 @@ public class GraveCatalogue extends Item implements MenuProvider
         return InteractionResult.CONSUME;
     }
 
-    @SuppressWarnings("null")
     InteractionResult teleportSuccesfullyGrave(Player player, ServerLevel level, BlockPos pos)
     {
-        DimensionTransition transition = new DimensionTransition(level, pos.relative(player.getNearestViewDirection()).getCenter(), Vec3.ZERO,
-                                                                 0f, 0f, DimensionTransition.DO_NOTHING);
+        DimensionTransition transition = new DimensionTransition(
+            level,
+            pos.relative(player.getNearestViewDirection()).getCenter(),
+            Vec3.ZERO,
+            0f,
+            0f,
+            DimensionTransition.DO_NOTHING);
         player.changeDimension(transition);
         if(level instanceof ServerLevel server)
         {
@@ -192,11 +183,69 @@ public class GraveCatalogue extends Item implements MenuProvider
         return InteractionResult.CONSUME;
     }
 
-    @SuppressWarnings("null")
-    InteractionResult recoversSuccesfullyGrave(Player player, ServerLevel level, BlockPos deathPos, SimpleGraveEntity grave)
+    private void giveRecoveryChests(Player player, ServerLevel level, GraveBlockEntity grave)
+    {
+        NonNullList<ItemStack> graveItems = grave.getItems();
+        NonNullList<ItemStack> curiosItems = grave.getCuriosItems();
+
+        List<ItemStack> allItems = new ArrayList<>();
+        for (ItemStack s : graveItems)
+        {
+            if (!s.isEmpty()) allItems.add(s.copy());
+        }
+        if (curiosItems != null)
+        {
+            for (ItemStack s : curiosItems)
+            {
+                if (!s.isEmpty()) allItems.add(s.copy());
+            }
+            curiosItems.clear();
+        }
+        graveItems.clear();
+        grave.setChanged();
+
+        if (allItems.isEmpty()) return;
+
+        int chunkSize = 27;
+        int totalChests = (int) Math.ceil((double) allItems.size() / chunkSize);
+
+        for (int c = 0; c < totalChests; c++)
+        {
+            int start = c * chunkSize;
+            int end = Math.min(start + chunkSize, allItems.size());
+            List<ItemStack> subList = allItems.subList(start, end);
+
+            NonNullList<ItemStack> chestContents = NonNullList.withSize(27, ItemStack.EMPTY);
+            for (int i = 0; i < subList.size(); i++)
+            {
+                chestContents.set(i, subList.get(i));
+            }
+
+            ItemStack chestStack = new ItemStack(Blocks.CHEST);
+
+            Component customName = (totalChests > 1)
+                ? Component.translatable("item.catalystgraves.recovery_chest_numbered", player.getScoreboardName(), c + 1, totalChests)
+                    .withStyle(ChatFormatting.GOLD, ChatFormatting.ITALIC)
+                : Component.translatable("item.catalystgraves.recovery_chest", player.getScoreboardName())
+                    .withStyle(ChatFormatting.GOLD, ChatFormatting.ITALIC);
+
+            chestStack.set(DataComponents.CUSTOM_NAME, customName);
+
+            chestStack.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(chestContents));
+
+            if (!player.getInventory().add(chestStack))
+            {
+                player.drop(chestStack, false);
+            }
+        }
+    }
+
+    InteractionResult recoversSuccesfullyGrave(Player player, ServerLevel level, BlockPos deathPos, GraveBlockEntity grave)
     {
         BlockPos pos = player.blockPosition();
-        GraveLogic.RestoreContents(level, player, grave.getItems());
+
+        giveRecoveryChests(player, level, grave);
+
         level.setBlockAndUpdate(deathPos, Blocks.COBBLESTONE_WALL.defaultBlockState());
         if(level instanceof ServerLevel server)
         {
@@ -207,7 +256,55 @@ public class GraveCatalogue extends Item implements MenuProvider
         return InteractionResult.CONSUME;
     }
 
-    @SuppressWarnings("null")
+    private InteractionResult attemptPortalRecovery(ServerPlayer player, Level level, BlockPos clickedPos, float successChance, int cooldownTicks)
+    {
+        if (player.getCooldowns().isOnCooldown(this))
+        {
+            return InteractionResult.FAIL;
+        }
+
+        boolean hasCorporeal = AdvancementLogic.hasAdvancement(player, CGAdvancementProvider.CORPOREAL_RECALL);
+        if (!hasCorporeal)
+        {
+            player.sendSystemMessage(Component.translatable("string.grave.fail.no_advancement").withStyle(ChatFormatting.RED));
+            return InteractionResult.FAIL;
+        }
+
+        Optional<GlobalPos> death = player.getLastDeathLocation();
+        if (death.isEmpty())
+            return failsOnLocateGrave(player);
+
+        BlockPos deathPos = death.get().pos();
+        ServerLevel target = level.getServer().getLevel(death.get().dimension());
+
+        if (target == null)
+            return graveFailLevelNull(player);
+
+        if (!(target.getBlockEntity(deathPos) instanceof GraveBlockEntity grave))
+        {
+            player.sendSystemMessage(Component.translatable("string.grave.fail"));
+            return InteractionResult.CONSUME;
+        }
+
+        player.getCooldowns().addCooldown(this, cooldownTicks);
+
+        if (level.random.nextFloat() < successChance)
+        {
+            player.sendSystemMessage(Component.translatable("string.grave.portal.success").withStyle(ChatFormatting.GREEN));
+            return recoversSuccesfullyGrave(player, target, deathPos, grave);
+        }
+        else
+        {
+            if (level instanceof ServerLevel server)
+            {
+                server.sendParticles(ParticleTypes.LARGE_SMOKE, clickedPos.getX() + 0.5, clickedPos.getY() + 0.5, clickedPos.getZ() + 0.5, 25, 0.2, 0.2, 0.2, 0.05);
+                server.playSound(null, clickedPos, SoundEvents.RESPAWN_ANCHOR_DEPLETE.value(), SoundSource.PLAYERS, 1.0f, 0.5f);
+            }
+            player.sendSystemMessage(Component.translatable("string.grave.portal.failed").withStyle(ChatFormatting.RED));
+            return InteractionResult.CONSUME;
+        }
+    }
+
     @Override
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context)
     {
@@ -215,45 +312,48 @@ public class GraveCatalogue extends Item implements MenuProvider
         BlockPos pos = context.getClickedPos();
         if(!(context.getPlayer() instanceof ServerPlayer player)) return InteractionResult.PASS;
 
-        // Open Soulbound UI on Enchanting Table
-        if(level.getBlockState(pos).is(Blocks.ENCHANTING_TABLE))
+        BlockState state = level.getBlockState(pos);
+
+        if(state.is(Blocks.ENCHANTING_TABLE))
         {
             return openSoulbindMenu(player, player.serverLevel(), pos);
         }
 
-        // Remote grave recovery via Ender Chest
-        if(level.getBlockState(pos).is(Blocks.ENDER_CHEST))
+        if(state.is(Blocks.ENDER_CHEST))
         {
-            if(!(player instanceof ServerPlayer serverPlayer))
-                return InteractionResult.PASS;
-
-            ServerAdvancementManager manager = serverPlayer.server.getAdvancements();
-            AdvancementHolder corporealHolder = manager.get(CGAdvancementProvider.CORPOREAL_RECALL);
-            boolean hasCorporeal = corporealHolder != null && serverPlayer.getAdvancements().getOrStartProgress(corporealHolder).isDone();
-
+            boolean hasCorporeal = AdvancementLogic.hasAdvancement(player, CGAdvancementProvider.CORPOREAL_RECALL);
             if(!hasCorporeal)
             {
                 return InteractionResult.PASS;
             }
 
-            Optional<GlobalPos> death = serverPlayer.getLastDeathLocation();
+            Optional<GlobalPos> death = player.getLastDeathLocation();
             if(death.isEmpty())
-                return failsOnLocateGrave(serverPlayer);
+                return failsOnLocateGrave(player);
 
             BlockPos deathPos = death.get().pos();
             ServerLevel target = level.getServer().getLevel(death.get().dimension());
 
             if(target == null)
-                return graveFailLevelNull(serverPlayer);
+                return graveFailLevelNull(player);
 
-            if(target.getBlockEntity(deathPos) instanceof SimpleGraveEntity grave)
-                return recoversSuccesfullyGrave(serverPlayer, target, deathPos, grave);
+            if(target.getBlockEntity(deathPos) instanceof GraveBlockEntity grave)
+                return recoversSuccesfullyGrave(player, target, deathPos, grave);
+        }
+
+        if(state.is(Blocks.NETHER_PORTAL))
+        {
+            return attemptPortalRecovery(player, level, pos, 0.25f, 100);
+        }
+
+        if(state.is(Blocks.END_PORTAL) || state.is(Blocks.END_PORTAL_FRAME) || state.is(Blocks.END_GATEWAY))
+        {
+            return attemptPortalRecovery(player, level, pos, 0.50f, 50);
         }
 
         return super.useOn(context);
     }
 
-    @SuppressWarnings("null")
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand)
     {
@@ -266,7 +366,6 @@ public class GraveCatalogue extends Item implements MenuProvider
 
         if(player instanceof ServerPlayer server)
         {
-            // Logic for Sneak + Right Click (Teleportation)
             if(server.isShiftKeyDown())
             {
                 ResourceLocation advancementId = ResourceLocation.parse("catalystgraves:corporeal_recall");
@@ -290,14 +389,12 @@ public class GraveCatalogue extends Item implements MenuProvider
                     return InteractionResultHolder.fail(stack);
                 }
 
-                // Find the first valid grave in the history list
                 while(!graves.isEmpty())
                 {
                     GlobalPos targetGrave = graves.get(0);
                     BlockPos deathPos = targetGrave.pos();
                     ServerLevel targetLevel = level.getServer().getLevel(targetGrave.dimension());
 
-                    // Remove invalid or destroyed graves from the list
                     if(targetLevel == null || !targetLevel.getBlockState(deathPos).is(CGBlocks.SIMPLE_GRAVE))
                     {
                         graves.remove(0);
@@ -318,7 +415,6 @@ public class GraveCatalogue extends Item implements MenuProvider
                 player.sendSystemMessage(Component.translatable("string.grave.fail"));
                 return InteractionResultHolder.consume(stack);
             }
-            // Logic for Normal Right Click (Open Menu)
             else
             {
                 server.openMenu(this);
