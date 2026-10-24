@@ -1,4 +1,4 @@
-package com.natesky9.catalystgraves.compat.client;
+package com.natesky9.catalystgraves.client;
 
 import com.natesky9.catalystgraves.CatalystGraves;
 import net.neoforged.api.distmarker.Dist;

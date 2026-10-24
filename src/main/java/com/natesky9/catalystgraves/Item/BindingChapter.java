@@ -7,7 +7,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import org.jetbrains.annotations.Nullable;
 
-import com.natesky9.catalystgraves.compat.client.menus.BindingMenu;
+import com.natesky9.catalystgraves.client.menus.BindingMenu;
 
 @SuppressWarnings("null")
 public class BindingChapter implements MenuProvider

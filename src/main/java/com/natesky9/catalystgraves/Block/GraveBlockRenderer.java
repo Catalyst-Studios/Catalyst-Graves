@@ -1,7 +1,7 @@
 package com.natesky9.catalystgraves.block;
 
-import com.natesky9.catalystgraves.compat.client.CGClientConfig;
-import com.natesky9.catalystgraves.compat.client.CGRenderTypes;
+import com.natesky9.catalystgraves.client.CGClientConfig;
+import com.natesky9.catalystgraves.client.CGRenderTypes;
 import com.natesky9.catalystgraves.init.CGBlocks;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;

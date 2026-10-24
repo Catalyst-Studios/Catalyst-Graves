@@ -1,9 +1,9 @@
-package com.natesky9.catalystgraves.compat.client.screen;
+package com.natesky9.catalystgraves.client.screen;
 
 import com.natesky9.catalystgraves.CatalystGraves;
-import com.natesky9.catalystgraves.compat.client.CGClientEvents;
-import com.natesky9.catalystgraves.compat.client.menus.BindingMenu;
-import com.natesky9.catalystgraves.compat.client.menus.BindingPacket;
+import com.natesky9.catalystgraves.client.CGClientEvents;
+import com.natesky9.catalystgraves.client.menus.BindingMenu;
+import com.natesky9.catalystgraves.client.menus.BindingPacket;
 import com.natesky9.catalystgraves.init.CGConfig;
 import com.natesky9.catalystgraves.server.GraveLogic;
 import com.mojang.blaze3d.systems.RenderSystem;

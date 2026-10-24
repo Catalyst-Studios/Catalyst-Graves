@@ -1,11 +1,11 @@
-package com.natesky9.catalystgraves.compat.client;
+package com.natesky9.catalystgraves.client;
 
 import com.natesky9.catalystgraves.CatalystGraves;
 import com.natesky9.catalystgraves.block.GraveBlockRenderer;
-import com.natesky9.catalystgraves.compat.client.screen.BindingScreen;
-import com.natesky9.catalystgraves.compat.client.screen.CatalogueScreen;
-import com.natesky9.catalystgraves.compat.client.tooltip.CatalogueClientTooltipComponent;
-import com.natesky9.catalystgraves.compat.client.tooltip.CatalogueTooltipData;
+import com.natesky9.catalystgraves.client.screen.BindingScreen;
+import com.natesky9.catalystgraves.client.screen.CatalogueScreen;
+import com.natesky9.catalystgraves.client.tooltip.CatalogueClientTooltipComponent;
+import com.natesky9.catalystgraves.client.tooltip.CatalogueTooltipData;
 import com.natesky9.catalystgraves.init.CGBlockEntities;
 import com.natesky9.catalystgraves.init.CGMenus;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;

@@ -1,8 +1,8 @@
 package com.natesky9.catalystgraves.init;
 
 import com.natesky9.catalystgraves.CatalystGraves;
-import com.natesky9.catalystgraves.compat.client.menus.BindingMenu;
-import com.natesky9.catalystgraves.compat.client.menus.CatalogueMenu;
+import com.natesky9.catalystgraves.client.menus.BindingMenu;
+import com.natesky9.catalystgraves.client.menus.CatalogueMenu;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.inventory.MenuType;

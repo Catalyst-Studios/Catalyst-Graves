@@ -2,8 +2,9 @@ package com.natesky9.catalystgraves.item;
 
 import com.natesky9.catalystgraves.AdvancementLogic;
 import com.natesky9.catalystgraves.block.GraveBlockEntity;
-import com.natesky9.catalystgraves.compat.client.menus.CatalogueMenu;
-import com.natesky9.catalystgraves.compat.client.tooltip.CatalogueTooltipData;
+import com.natesky9.catalystgraves.client.ColorUtils;
+import com.natesky9.catalystgraves.client.menus.CatalogueMenu;
+import com.natesky9.catalystgraves.client.tooltip.CatalogueTooltipData;
 import com.natesky9.catalystgraves.datagen.CGAdvancementProvider;
 import com.natesky9.catalystgraves.init.CGBlocks;
 import com.natesky9.catalystgraves.init.CGConfig;
@@ -20,8 +21,8 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -111,10 +112,17 @@ public class GraveCatalogue extends Item implements MenuProvider
     @Override
     public Optional<TooltipComponent> getTooltipImage(ItemStack stack)
     {
-        if(Screen.hasShiftDown())
+        if (Screen.hasShiftDown())
         {
-            Component infoText = Component.translatable("tooltip.catalystgraves.catalogue.info")
-                                     .withStyle(Style.EMPTY.withColor(TextColor.fromRgb(0xF74611)));
+            MutableComponent infoText = Component.empty()
+                .append(ColorUtils.parseTranslatable("tooltip.catalystgraves.catalogue.info.air")).append("\n")
+                .append(ColorUtils.parseTranslatable("tooltip.catalystgraves.catalogue.info.enchanting_table")).append("\n")
+                .append(ColorUtils.parseTranslatable("tooltip.catalystgraves.catalogue.info.corporeal_header")).append("\n")
+                .append(ColorUtils.parseTranslatable("tooltip.catalystgraves.catalogue.info.sneak")).append("\n")
+                .append(ColorUtils.parseTranslatable("tooltip.catalystgraves.catalogue.info.ender_chest")).append("\n")
+                .append(ColorUtils.parseTranslatable("tooltip.catalystgraves.catalogue.info.nether_portal")).append("\n")
+                .append(ColorUtils.parseTranslatable("tooltip.catalystgraves.catalogue.info.end_portal"));
+
             return Optional.of(new CatalogueTooltipData(infoText));
         }
         return Optional.empty();

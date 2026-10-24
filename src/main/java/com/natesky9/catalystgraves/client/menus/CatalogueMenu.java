@@ -1,4 +1,4 @@
-package com.natesky9.catalystgraves.compat.client.menus;
+package com.natesky9.catalystgraves.client.menus;
 
 import com.natesky9.catalystgraves.init.CGMenus;
 import net.minecraft.network.FriendlyByteBuf;
