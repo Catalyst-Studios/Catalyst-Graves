@@ -125,6 +125,16 @@
   "tooltip.catalystgraves.catalogue.info.ender_chest": "  #EAA400Sneak + Right-click on a #33FFFFEnder Chest#r#A0A0A0: 100% remote recovery",
   "tooltip.catalystgraves.catalogue.info.nether_portal": "  #EAA400Right-click #FF5555Nether Portal#r#A0A0A0: 25% recovery (5s cooldown when fails)",
   "tooltip.catalystgraves.catalogue.info.end_portal": "  #EAA400Right-click #D055FFEnd Portal / Frame#r#A0A0A0: 50% recovery (2.5s cooldown when fails)",
+
+  "tooltip.catalystgraves.press_ctrl": "Press %s for mechanics & commands...",
+  "tooltip.catalystgraves.catalogue.ctrl.header": "#33FFFFMechanics & Upgrades:#r",
+  "tooltip.catalystgraves.catalogue.ctrl.xp": "#EAA400XP Retained#r#A0A0A0: Saves 75% under level 100 and 90% above level 100",
+  "tooltip.catalystgraves.catalogue.ctrl.vitality": "#EAA400Vitality Upgrade#r#A0A0A0: Grants stat buffs when collecting your grave",
+  "tooltip.catalystgraves.catalogue.ctrl.recovery_chest": "#EAA400Remote Recovery#r#A0A0A0: Requires Corporeal Recall upgrade and delivers items in a named chest without XP",
+  "tooltip.catalystgraves.catalogue.ctrl.backup": "#EAA400Backup System#r#A0A0A0: Separate file storing up to 10 deaths per player in case of corruption caused by death",
+  "tooltip.catalystgraves.catalogue.ctrl.commands_user": "#EAA400User Commands#r#A0A0A0: /grave find to locate graves and /grave tp to teleport with Corporeal Recall",
+  "tooltip.catalystgraves.catalogue.ctrl.commands_admin": "#EAA400Admin Commands#r#A0A0A0: /grave restore, recover and backup for OP players, in case something bad happens",
+
   "item.catalystgraves.recovery_chest": "Restored Grave Chest (%s)",
   "item.catalystgraves.recovery_chest_numbered": "Restored Grave Chest (%s) [%d/%d]"
 }

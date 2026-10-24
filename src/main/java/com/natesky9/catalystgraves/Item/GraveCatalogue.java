@@ -89,8 +89,7 @@ public class GraveCatalogue extends Item implements MenuProvider
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag)
     {
-
-        if(!Screen.hasShiftDown())
+        if (!Screen.hasShiftDown() && !Screen.hasControlDown())
         {
             Component itemName = getTransmuteItemName().copy().withStyle(ChatFormatting.YELLOW);
 
@@ -104,6 +103,12 @@ public class GraveCatalogue extends Item implements MenuProvider
                             "tooltip.catalystgraves.press_shift",
                             Component.literal("SHIFT").withStyle(ChatFormatting.YELLOW))
                     .withStyle(ChatFormatting.DARK_GRAY));
+
+            tooltipComponents.add(
+                Component.translatable(
+                            "tooltip.catalystgraves.press_ctrl",
+                            Component.literal("CTRL").withStyle(ChatFormatting.YELLOW))
+                    .withStyle(ChatFormatting.DARK_GRAY));
         }
         
         super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
@@ -112,7 +117,19 @@ public class GraveCatalogue extends Item implements MenuProvider
     @Override
     public Optional<TooltipComponent> getTooltipImage(ItemStack stack)
     {
-        if (Screen.hasShiftDown())
+        if (Screen.hasControlDown())
+        {
+            MutableComponent infoText = Component.empty()
+                .append(ColorUtils.parseTranslatable("tooltip.catalystgraves.catalogue.ctrl.header")).append("\n")
+                .append(ColorUtils.parseTranslatable("tooltip.catalystgraves.catalogue.ctrl.xp")).append("\n")
+                .append(ColorUtils.parseTranslatable("tooltip.catalystgraves.catalogue.ctrl.recovery_chest")).append("\n")
+                .append(ColorUtils.parseTranslatable("tooltip.catalystgraves.catalogue.ctrl.backup")).append("\n")
+                .append(ColorUtils.parseTranslatable("tooltip.catalystgraves.catalogue.ctrl.commands_user")).append("\n")
+                .append(ColorUtils.parseTranslatable("tooltip.catalystgraves.catalogue.ctrl.commands_admin"));
+
+            return Optional.of(new CatalogueTooltipData(infoText));
+        }
+        else if (Screen.hasShiftDown())
         {
             MutableComponent infoText = Component.empty()
                 .append(ColorUtils.parseTranslatable("tooltip.catalystgraves.catalogue.info.air")).append("\n")
