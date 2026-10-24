@@ -117,6 +117,7 @@
   "gui.catalystgraves.insufficient_levels": "Requires %d XP levels!",
 
   "tooltip.catalystgraves.press_shift": "Press %s to examine secrets...",
+  "tooltip.catalystgraves.obtain_info": "Sleep while holding a %s to obtain this book.",
   "tooltip.catalystgraves.catalogue.info": "§6Right-click air§r to view grave advancements.\n§bRight-click Enchanting Table§r for Soulbound binding.\n§dSneak + Right-click§r to teleport to your grave.\n§aRight-click Ender Chest§r for 100% remote recovery.\n§cNether Portal§r: 25% recovery chance (5s cooldown).\n§dEnd Portal / Frame§r: 50% recovery chance (2.5s cooldown).",
   "item.catalystgraves.recovery_chest": "Restored Grave Chest (%s)",
   "item.catalystgraves.recovery_chest_numbered": "Restored Grave Chest (%s) [%d/%d]"

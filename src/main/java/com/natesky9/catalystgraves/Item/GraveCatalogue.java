@@ -6,6 +6,7 @@ import com.natesky9.catalystgraves.compat.client.menus.CatalogueMenu;
 import com.natesky9.catalystgraves.compat.client.tooltip.CatalogueTooltipData;
 import com.natesky9.catalystgraves.datagen.CGAdvancementProvider;
 import com.natesky9.catalystgraves.init.CGBlocks;
+import com.natesky9.catalystgraves.init.CGConfig;
 import com.natesky9.catalystgraves.server.GraveLogic;
 
 import net.minecraft.ChatFormatting;
@@ -17,6 +18,7 @@ import net.minecraft.core.GlobalPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
@@ -35,6 +37,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.context.UseOnContext;
@@ -66,17 +69,42 @@ public class GraveCatalogue extends Item implements MenuProvider
         return Component.translatable("menu.catalogue");
     }
 
+    private Component getTransmuteItemName()
+    {
+        String itemId = CGConfig.TRANSMUTE_ITEM.get();
+        ResourceLocation location = ResourceLocation.tryParse(itemId);
+        
+        if(location != null)
+        {
+            Item item = BuiltInRegistries.ITEM.get(location);
+            if(item != Items.AIR)
+            {
+                return item.getDefaultInstance().getHoverName();
+            }
+        }
+        return Component.literal(itemId);
+    }
+
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag)
     {
+
         if(!Screen.hasShiftDown())
         {
+            Component itemName = getTransmuteItemName().copy().withStyle(ChatFormatting.YELLOW);
+
+            tooltipComponents.add(
+                Component.translatable("tooltip.catalystgraves.obtain_info", itemName)
+                        .withStyle(ChatFormatting.GRAY)
+            );
+            
             tooltipComponents.add(
                 Component.translatable(
-                             "tooltip.catalystgraves.press_shift",
-                             Component.literal("SHIFT").withStyle(ChatFormatting.YELLOW))
+                            "tooltip.catalystgraves.press_shift",
+                            Component.literal("SHIFT").withStyle(ChatFormatting.YELLOW))
                     .withStyle(ChatFormatting.DARK_GRAY));
         }
+        
         super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
     }
 
